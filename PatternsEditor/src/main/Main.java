@@ -7,6 +7,7 @@ import controller.EditorController;
 import controller.MainScreenController;
 import controller.VersionPanelController;
 import model.DiagramModel;
+import model.PatternModel;
 import model.State;
 import view.EditorView;
 import view.MainScreen;
@@ -24,16 +25,17 @@ public class Main {
 		EditorView editorView = new EditorView(versionPanelView);
 		MainScreen mainScreen = new MainScreen(mainMenuBar, editorView);
 		
+		PatternModel patternModel = new PatternModel();
 		DiagramModel diagramModel = new DiagramModel();
 		
 		EditorController editorController = new EditorController(editorView, diagramModel);
 		VersionPanelController versionPanelController = new VersionPanelController(versionPanelView, diagramModel);
-		MainScreenController mainScreenController = new MainScreenController(mainScreen, diagramModel);
+		MainScreenController mainScreenController = new MainScreenController(mainScreen, diagramModel, patternModel);
 		
 		versionPanelView.setController(versionPanelController);
 		editorView.setController(editorController);
 		mainMenuBar.setController(mainScreenController);
-		mainScreen.setController(mainScreenController);		
+		mainScreen.setController(mainScreenController);
 	}
 
 }

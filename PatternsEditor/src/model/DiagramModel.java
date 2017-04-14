@@ -39,7 +39,7 @@ public class DiagramModel {
 	}
 	
 	public void changeVersion(String name){
-		currentDiagram.changeVersion(name);
+		currentDiagram.changeVersion(name);		
 		propertyChangeSupport.firePropertyChange("versionChange", null, currentDiagram.getCurrentVersion());
 	}
 	

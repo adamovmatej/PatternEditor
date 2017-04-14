@@ -7,34 +7,33 @@ import java.util.Map;
 public class State implements Serializable {
 
 	private static final long serialVersionUID = 4673115549643245981L;
-	
-	private String name;
+
+	private Diagram diagram;
 	private Map<String, String> scenes;
+	private Map<String, String> names;
 	
 	public State(){
 	}
 	
-	public State(String name, String scene, String version) {
+	public State(String name, String scene, String version, Diagram diagram) {
+		this.diagram = diagram;
 		scenes = new HashMap<>();
+		names = new HashMap<>();
 		scenes.put(version, scene);
-		this.name = name;
+		names.put(version, name);
 	}
 	
 	public void update(String name, String scene, String version){
-		this.name = name;
 		if (scenes.containsKey(version)){
 			scenes.replace(version, scene);			
 		} else {
 			scenes.put(version, scene);
 		}
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+		if (names.containsKey(version)){
+			names.replace(version, scene);			
+		} else {
+			names.put(version, scene);
+		}
 	}
 	
 	public String getScene(String version){
@@ -51,9 +50,31 @@ public class State implements Serializable {
 		}
 	}
 	
+	public String getName(String version){
+		String result = names.get(version);
+		if (!(result==null)){
+			return result;
+		} else {
+			String def = names.get("Default");
+			if (!(def==null)){
+				return def;
+			} else {
+				return "Default - empty";
+			}
+		}
+	}
+	
 	@Override
 	public String toString() {
-		return name;
+		return getName(diagram.getCurrentVersion().getVersion());
+	}
+
+	public Map<String, String> getNames() {
+		return names;
+	}
+
+	public void setNames(Map<String, String> names) {
+		this.names = names;
 	}
 }
 

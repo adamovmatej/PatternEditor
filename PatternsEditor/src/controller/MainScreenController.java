@@ -2,18 +2,23 @@ package controller;
 
 import javax.swing.JComboBox;
 import model.DiagramModel;
+import model.Pattern;
+import model.PatternModel;
 import view.MainScreen;
 import view.dialogs.NewDiagramDialog;
+import view.dialogs.PatternDialog;
 
 public class MainScreenController {
 
 	private MainScreen view;
 	private DiagramModel diagramModel;
+	private PatternModel patternModel;
 	
 	
-	public MainScreenController(MainScreen mainScreen, DiagramModel diagramModel) {
+	public MainScreenController(MainScreen mainScreen, DiagramModel diagramModel, PatternModel patternModel) {
 		this.view = mainScreen;
 		this.diagramModel = diagramModel;
+		this.patternModel = patternModel;
 	}
 	
 	public void createNewDiagramDialog(){
@@ -35,11 +40,15 @@ public class MainScreenController {
 		diagramModel.createVersion(name, version, main);
 	}
 	
+	public void createNewPatternDialog() {
+		PatternDialog dialog = new PatternDialog(this, "new");
+		dialog.setVisible(true);
+	}
+
 	public void initCombobox(JComboBox<String> comboBox){
-		comboBox.addItem("Architect also implements");
-		comboBox.addItem("Variation behind interface");
-		comboBox.addItem("Stand up meetings");
-		comboBox.addItem("Code ownership");
+		for (String str : patternModel.getPatterns()) {
+			comboBox.addItem(str);
+		}
 		comboBox.setSelectedIndex(0);
 	}
 
@@ -49,5 +58,15 @@ public class MainScreenController {
 
 	public void setDiagramModel(DiagramModel diagramModel) {
 		this.diagramModel = diagramModel;
+	}
+
+
+	public void createNewPattern(String name, String desc) {
+		patternModel.createPattern(name, desc);
+	}
+
+	public void updatePattern(String name, String desc) {
+		// TODO Auto-generated method stub
+				
 	}
 }

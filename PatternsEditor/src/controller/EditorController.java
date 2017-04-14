@@ -44,7 +44,7 @@ public class EditorController implements PropertyChangeListener{
 	public void createStatePropertiesDialog(MouseEvent me){
 		Diagram diagram = (Diagram)(view.getMap().getSelectedComponent());
 		State state = (State) ((mxCell)(diagram.getCellAt(me.getX(), me.getY()))).getValue();
-		StatePropertieDialog dialog = new StatePropertieDialog(this, state.getName(), state.getScene(diagram.getCurrentVersion().getVersion()), false, me);
+		StatePropertieDialog dialog = new StatePropertieDialog(this, state.getName(diagram.getCurrentVersion().getVersion()), state.getScene(diagram.getCurrentVersion().getVersion()), false, me);
 		dialog.setVisible(true);
 	}
 	
@@ -56,7 +56,7 @@ public class EditorController implements PropertyChangeListener{
 	public void createState(String name, String scene, MouseEvent me) {
 		Diagram diagram = (Diagram)view.getMap().getSelectedComponent();
 		mxGraph graph = diagram.getGraph();
-		State state = new State(name, scene, diagram.getCurrentVersion().getVersion());
+		State state = new State(name, scene, diagram.getCurrentVersion().getVersion(), diagram);
 		
 		graph.getModel().beginUpdate();
 		try{

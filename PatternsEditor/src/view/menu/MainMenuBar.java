@@ -15,7 +15,8 @@ public class MainMenuBar extends JMenuBar{
 	private MainScreenController controller;
 	
 	private JMenu file = new JMenu("File");
-	private JMenuItem newDiagram = new JMenuItem("New Pattern");
+	private JMenuItem newPattern = new JMenuItem("New Pattern");
+	private JMenuItem newDiagram = new JMenuItem("New Diagram");
 	private JMenuItem newVersion = new JMenuItem("New Version");
 	private JMenuItem save = new JMenuItem("Save");
 	private JMenuItem saveAs = new JMenuItem("Save as");
@@ -28,6 +29,13 @@ public class MainMenuBar extends JMenuBar{
 	
 	public MainMenuBar() {
 				
+		newPattern.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.createNewPatternDialog();
+			}
+		});
+		
 		newDiagram.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -60,6 +68,7 @@ public class MainMenuBar extends JMenuBar{
 		
 		file.add(newDiagram);
 		file.add(newVersion);
+		file.add(newPattern);
 		file.addSeparator();
 		file.add(save);
 		file.add(saveAs);

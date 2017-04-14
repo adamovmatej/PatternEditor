@@ -38,6 +38,8 @@ public class Diagram extends mxGraphComponent{
 
 	public void changeVersion(String name) {
 		currentVersion = getVersion(name);
+		graph.refresh();
+		graph.repaint();
 	}
 
 	public void setCurrentFile(File file) {

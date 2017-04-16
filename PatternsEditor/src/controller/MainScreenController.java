@@ -5,8 +5,8 @@ import model.DiagramModel;
 import model.Pattern;
 import model.PatternModel;
 import view.MainScreen;
-import view.dialogs.NewDiagramDialog;
-import view.dialogs.PatternDialog;
+import view.dialog.DiagramDialog;
+import view.dialog.PatternDialog;
 
 public class MainScreenController {
 
@@ -22,7 +22,7 @@ public class MainScreenController {
 	}
 	
 	public void createNewDiagramDialog(){
-		NewDiagramDialog dialog = new NewDiagramDialog(this, "diagram");
+		DiagramDialog dialog = new DiagramDialog(this, "diagram");
 		dialog.setVisible(true);		
 	}
 	
@@ -31,7 +31,7 @@ public class MainScreenController {
 	}
 	
 	public void createNewVersionDialog() {
-		NewDiagramDialog dialog = new NewDiagramDialog(this, "version");
+		DiagramDialog dialog = new DiagramDialog(this, "version");
 		dialog.getPatternComboBox().setEnabled(false);
 		dialog.setVisible(true);
 	}

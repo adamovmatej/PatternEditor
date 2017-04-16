@@ -17,7 +17,7 @@ public class RightClickMapMenu extends JPopupMenu {
 	
 	private JMenuItem newState;
 	
-    public RightClickMapMenu(EditorController controller, MouseEvent me){
+    public RightClickMapMenu(EditorController controller, MouseEvent me) {
     	this.controller = controller;
     	
     	newState  = new JMenuItem("New State");
@@ -25,9 +25,8 @@ public class RightClickMapMenu extends JPopupMenu {
     	newState.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				controller.createNewStateDialog(me);
-			}
-			
+				controller.createStateDialog(me);					
+			}	
 		});
     	
         add(newState);

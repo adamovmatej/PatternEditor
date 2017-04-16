@@ -1,4 +1,4 @@
-package view.dialogs;
+package view.dialog;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -11,8 +11,9 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
+import javax.swing.JCheckBox;
 
-public class StatePropertieDialog extends JDialog {
+public class StatePropertiesDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -20,7 +21,7 @@ public class StatePropertieDialog extends JDialog {
 	private JTextField nameField;
 	private JTextArea sceneText;
 	
-	public StatePropertieDialog(EditorController controller, String name, String scene, Boolean newState, MouseEvent me) {
+	public StatePropertiesDialog(EditorController controller, String name, String scene, Boolean disable, Boolean newState, MouseEvent me) {
 		setBounds(200, 200, 450, 300);
 		setAlwaysOnTop(true);
 		
@@ -46,17 +47,22 @@ public class StatePropertieDialog extends JDialog {
 		sceneText.setBorder(nameField.getBorder());
 		getContentPane().add(sceneText);
 		
+		JCheckBox disableCheckBox = new JCheckBox("Disabled:");
+		disableCheckBox.setSelected(disable);
+		disableCheckBox.setBounds(3, 58, 129, 23);
+		getContentPane().add(disableCheckBox);
+		
 		JButton btnNewButton = new JButton("OK");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (newState){
-					controller.createState(nameField.getText(), sceneText.getText(), me);
+					controller.createState(nameField.getText(), sceneText.getText(), disableCheckBox.isSelected(), me);
 				} else{
 					if (!nameField.getText().equals(null) || !scene.equals(sceneText.getText())){
-						controller.updateState(nameField.getText(), sceneText.getText(), me);
+						controller.updateState(nameField.getText(), sceneText.getText(), disableCheckBox.isSelected(), me);
 					}					
 				}
-				StatePropertieDialog.this.dispose();
+				StatePropertiesDialog.this.dispose();
 			}
 		});
 		btnNewButton.setBounds(335, 227, 89, 23);
@@ -65,7 +71,7 @@ public class StatePropertieDialog extends JDialog {
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				StatePropertieDialog.this.dispose();
+				StatePropertiesDialog.this.dispose();
 			}
 		});
 		btnCancel.setBounds(236, 227, 89, 23);

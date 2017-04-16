@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PatternModel {
+	
 	private List<String> patterns;
 	
 	public PatternModel(){

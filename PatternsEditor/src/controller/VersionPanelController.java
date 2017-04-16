@@ -44,6 +44,12 @@ public class VersionPanelController implements PropertyChangeListener{
 			selectTableRow(version);
 			return;
 		}
+		if (evt.getPropertyName().equals("changeDiagram")){
+			VersionModel versionModel = (VersionModel) evt.getNewValue();
+			view.getMainTable().setModel(versionModel.getMainTableModel());
+			view.getVersionTable().setModel(versionModel.getSecondaryTableModel());
+			return;
+		}
 	}
 	
 	private void selectTableRow(Version version){

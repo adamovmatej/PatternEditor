@@ -1,11 +1,9 @@
-package listeners;
+package controller.listener;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import controller.EditorController;
-import model.Diagram;
-import view.menu.RightClickStateMenu;
 
 
 public class ClickMapListener extends MouseAdapter {

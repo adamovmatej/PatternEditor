@@ -76,6 +76,10 @@ public class DiagramModel {
 	}
 
 	public void setCurrentDiagram(Diagram currentDiagram) {
+		if (currentDiagram == this.currentDiagram){
+			return;
+		}
 		this.currentDiagram = currentDiagram;
+		propertyChangeSupport.firePropertyChange("changeDiagram", null, versionModels.get(currentDiagram.getPattern()));
 	}
 }

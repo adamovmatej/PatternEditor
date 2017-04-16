@@ -1,4 +1,4 @@
-package view.dialogs;
+package view.dialog;
 
 import javax.swing.JDialog;
 import javax.swing.JComboBox;
@@ -11,14 +11,14 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class NewDiagramDialog extends JDialog {
+public class DiagramDialog extends JDialog {
 	
 	private static final long serialVersionUID = 1L;
 
 	private JCheckBox mainCheckBox;
 	private JComboBox<String>  patternComboBox;
 	
-	public NewDiagramDialog(MainScreenController controller, String type) {
+	public DiagramDialog(MainScreenController controller, String type) {
 		setModal(true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setAlwaysOnTop(true);
@@ -67,7 +67,7 @@ public class NewDiagramDialog extends JDialog {
 					break;
 				}
 				
-				NewDiagramDialog.this.dispose();
+				DiagramDialog.this.dispose();
 			}
 		});
 		btnNewButton.setBounds(336, 148, 75, 23);
@@ -77,7 +77,7 @@ public class NewDiagramDialog extends JDialog {
 		btnCancel.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				NewDiagramDialog.this.dispose();
+				DiagramDialog.this.dispose();
 			}
 		});
 		btnCancel.setBounds(257, 148, 75, 23);

@@ -8,7 +8,7 @@ import javax.swing.JPopupMenu;
 
 import controller.EditorController;
 
-public class RightClickStateMenu extends JPopupMenu {
+public class RightClickCellMenu extends JPopupMenu {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -17,7 +17,7 @@ public class RightClickStateMenu extends JPopupMenu {
 	private JMenuItem properties;
 	private JMenuItem delete;
 	
-    public RightClickStateMenu(EditorController controller, MouseEvent me){
+    public RightClickCellMenu(EditorController controller, MouseEvent me){
     	this.controller = controller;
     	
     	properties  = new JMenuItem("Properties");
@@ -26,7 +26,7 @@ public class RightClickStateMenu extends JPopupMenu {
     	properties.addActionListener(new ActionListener() {	
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				controller.createStatePropertiesDialog(me);
+				controller.createPropertiesDialog(me);				
 			}
 			
 		});
@@ -34,7 +34,7 @@ public class RightClickStateMenu extends JPopupMenu {
     	delete.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO				
+				controller.createDeleteDialog();			
 			}
 		});
     	

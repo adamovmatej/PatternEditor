@@ -1,7 +1,11 @@
 package model;
 
-public class Version {
-	
+import java.io.Serializable;
+
+public class Version implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	private String pattern;
 	private String version;
 	private Boolean main;

@@ -15,6 +15,7 @@ import com.mxgraph.view.mxGraph;
 
 import controller.listener.ClickMapListener;
 import controller.listener.KeyMapListener;
+import controller.listener.MouseWheelListener;
 import model.Diagram;
 import model.DiagramModel;
 import model.Edge;
@@ -162,7 +163,7 @@ public class EditorController implements PropertyChangeListener{
 	private void initListeners(Diagram diagram) {
 		diagram.getGraphControl().addMouseListener(new ClickMapListener(this));
 		diagram.addKeyListener(new KeyMapListener(this));
-		//diagram.addMouseWheelListener(new MouseWheelMapListener(this));
+		diagram.addMouseWheelListener(new MouseWheelListener(diagram));
 	}
 
 	public void createDeleteDialog() {

@@ -1,22 +1,26 @@
 package model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import model.db.SQLConnection;
 
 public class PatternModel {
 	
 	private List<String> patterns;
 	
 	public PatternModel(){
-		patterns = new ArrayList<String>();
-		patterns.add("Architect also implements");
-		patterns.add("Variation behind interface");
-		patterns.add("Stand up meetings");
-		patterns.add("Code ownership");
+		this.patterns = dbGetAllPatterns();
 	}
 	
-	public void createPattern(String name, String desc){
+	public void createPattern(String name, String description){
 		patterns.add(name);
+		dbInsert(name, description);
 	}
 
 	public List<String> getPatterns() {
@@ -25,5 +29,42 @@ public class PatternModel {
 
 	public void setPatterns(List<String> patterns) {
 		this.patterns = patterns;
+	}
+	
+	private List<String> dbGetAllPatterns(){
+		List<String> list = new ArrayList<String>();
+		String sql = "SELECT name FROM pattern";
+		try (Connection connection = SQLConnection.getInstance().getConnection(); 
+				Statement stmt  = connection.createStatement();
+	            ResultSet rs    = stmt.executeQuery(sql)){
+	            
+	            while (rs.next()) {
+	            	list.add(rs.getString("name"));
+	            }
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+	    }
+		return list;
+	}
+	
+	private void dbInsert(String name, String description){
+		String sql = "INSERT INTO pattern(name,description) VALUES(?,?)";
+		Connection connection = SQLConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setString(2, description);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+        	System.out.println(sql);
+            System.out.println(e.getMessage());
+        } finally {
+        	try {
+        		if (connection != null){
+        			connection.close();
+        		}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+        }
 	}
 }

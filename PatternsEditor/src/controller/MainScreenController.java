@@ -1,8 +1,10 @@
 package controller;
 
+
 import javax.swing.JComboBox;
+
+import controller.listener.MainFrameListener;
 import model.DiagramModel;
-import model.Pattern;
 import model.PatternModel;
 import view.MainScreen;
 import view.dialog.DiagramDialog;
@@ -17,6 +19,7 @@ public class MainScreenController {
 	
 	public MainScreenController(MainScreen mainScreen, DiagramModel diagramModel, PatternModel patternModel) {
 		this.view = mainScreen;
+		view.addWindowListener(new MainFrameListener());
 		this.diagramModel = diagramModel;
 		this.patternModel = patternModel;
 	}

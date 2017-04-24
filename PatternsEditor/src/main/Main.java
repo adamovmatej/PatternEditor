@@ -7,8 +7,10 @@ import controller.EditorController;
 import controller.MainScreenController;
 import controller.VersionPanelController;
 import model.DiagramModel;
+import model.Edge;
 import model.PatternModel;
 import model.State;
+import model.db.SQLConnection;
 import view.EditorView;
 import view.MainScreen;
 import view.VersionPanelView;
@@ -18,7 +20,10 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		mxCodecRegistry.register(new mxObjectCodec(new State()));		
+		SQLConnection.getInstance().initDatabase();
+		
+		mxCodecRegistry.register(new mxObjectCodec(new State()));	
+		mxCodecRegistry.register(new mxObjectCodec(new Edge()));
 		
 		MainMenuBar mainMenuBar = new MainMenuBar();
 		VersionPanelView versionPanelView = new VersionPanelView();

@@ -13,34 +13,47 @@ public class DiagramModel {
 	private SwingPropertyChangeSupport propertyChangeSupport;
 	
 	private Map<String, Diagram> diagrams;
-	private Map<String, VersionModel> versionModels;
+	private Map<String, VariationModel> variationModels;
 	private Diagram currentDiagram;
 	
 	public DiagramModel() {
 		propertyChangeSupport = new SwingPropertyChangeSupport(this);
 		diagrams = new HashMap<String, Diagram>();
-		versionModels = new HashMap<String, VersionModel>();
+		variationModels = new HashMap<String, VariationModel>();
 	}
 	
-	public void createDiagram(String name, String version, Boolean main){
-		currentDiagram = new Diagram(new mxGraph(), name, version, main);
+	public void createDiagram(String name){
+		currentDiagram = new Diagram(new mxGraph(), name);
 		diagrams.put(name, currentDiagram);
-		VersionModel versionModel = new VersionModel(currentDiagram);
-		versionModels.put(name, versionModel);
-		propertyChangeSupport.firePropertyChange("newDiagram", versionModel, currentDiagram);
+		VariationModel variationModel = new VariationModel(currentDiagram);
+		variationModels.put(name, variationModel);
+		propertyChangeSupport.firePropertyChange("newDiagram", variationModel, currentDiagram);
 	}
 	
-	public void createVersion(String name, String version, Boolean main) {
-		Version ver = new Version(name, version, main);
-		getDiagram(name).createVersion(ver);
-		VersionModel versionModel = getVersionModel(name);
-		versionModel.addVersion(ver);
-		propertyChangeSupport.firePropertyChange("newVersion", null, ver);
+	public void createVersion(String name) {
+		Version version = new Version(currentDiagram.getPattern(), name);
+		currentDiagram.addVersion(version);
+		VariationModel variationModel = getVariationModel(version.getMainPattern());
+		variationModel.addVariation(version);
+		propertyChangeSupport.firePropertyChange("newVariation", null, version);
+	}
+	
+	public void createAdapter(String name) {
+		Adapter adapter = new Adapter(currentDiagram.getPattern(), name);
+		currentDiagram.addAdapter(adapter);
+		VariationModel variationModel = getVariationModel(adapter.getMainPattern());
+		variationModel.addVariation(adapter);
+		propertyChangeSupport.firePropertyChange("newVariation", null, adapter);
 	}
 	
 	public void changeVersion(String name){
 		currentDiagram.changeVersion(name);		
-		propertyChangeSupport.firePropertyChange("versionChange", null, currentDiagram.getCurrentVersion());
+		propertyChangeSupport.firePropertyChange("variationChange", null, currentDiagram.getCurrentVariation());
+	}
+	
+	public void changeAdapter(String name){
+		currentDiagram.changeAdapter(name);		
+		propertyChangeSupport.firePropertyChange("variationChange", null, currentDiagram.getCurrentVariation());
 	}
 	
 	public void addListener(PropertyChangeListener prop) {
@@ -59,16 +72,16 @@ public class DiagramModel {
 		this.diagrams = diagrams;
 	}
 	
-	private VersionModel getVersionModel(String name){
-		return versionModels.get(name);
+	private VariationModel getVariationModel(String name){
+		return variationModels.get(name);
 	}
 
-	public Map<String, VersionModel> getVersionModels() {
-		return versionModels;
+	public Map<String, VariationModel> getVersionModels() {
+		return variationModels;
 	}
 
-	public void setVersionModels(Map<String, VersionModel> versionModels) {
-		this.versionModels = versionModels;
+	public void setVersionModels(Map<String, VariationModel> versionModels) {
+		this.variationModels = versionModels;
 	}
 
 	public Diagram getCurrentDiagram() {
@@ -80,6 +93,6 @@ public class DiagramModel {
 			return;
 		}
 		this.currentDiagram = currentDiagram;
-		propertyChangeSupport.firePropertyChange("changeDiagram", null, versionModels.get(currentDiagram.getPattern()));
+		propertyChangeSupport.firePropertyChange("changeDiagram", null, variationModels.get(currentDiagram.getPattern()));
 	}
 }

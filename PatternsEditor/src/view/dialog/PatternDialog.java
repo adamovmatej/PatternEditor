@@ -3,6 +3,8 @@ package view.dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -21,7 +23,9 @@ public class PatternDialog extends JDialog {
 	private JTextField nameField;
 	private JTextArea descText;
 	
-	public PatternDialog(MainScreenController controller, String type) {
+	public PatternDialog(MainScreenController controller, String type, Locale locale) {
+		ResourceBundle bundle = ResourceBundle.getBundle("TextBundle", locale);	
+		
 		setBounds(200, 200, 450, 300);
 		setAlwaysOnTop(true);
 		
@@ -29,7 +33,7 @@ public class PatternDialog extends JDialog {
 		
 		getContentPane().setLayout(null);
 		
-		JLabel lblName = new JLabel("Name:");
+		JLabel lblName = new JLabel(bundle.getString("label.name")+":");
 		lblName.setBounds(10, 11, 46, 14);
 		getContentPane().add(lblName);
 		
@@ -38,7 +42,7 @@ public class PatternDialog extends JDialog {
 		getContentPane().add(nameField);
 		nameField.setColumns(10);
 		
-		JLabel lblDesc = new JLabel("Description:");
+		JLabel lblDesc = new JLabel(bundle.getString("label.description")+":");
 		lblDesc.setBounds(10, 36, 112, 14);
 		getContentPane().add(lblDesc);
 		
@@ -47,7 +51,7 @@ public class PatternDialog extends JDialog {
 		descText.setBorder(nameField.getBorder());
 		getContentPane().add(descText);
 		
-		JButton btnNewButton = new JButton("OK");
+		JButton btnNewButton = new JButton(bundle.getString("button.ok"));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (type == "new"){
@@ -61,7 +65,7 @@ public class PatternDialog extends JDialog {
 		btnNewButton.setBounds(335, 227, 89, 23);
 		getContentPane().add(btnNewButton);
 		
-		JButton btnCancel = new JButton("Cancel");
+		JButton btnCancel = new JButton(bundle.getString("button.cancel"));
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				PatternDialog.this.dispose();

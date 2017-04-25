@@ -11,7 +11,7 @@ public class Edge extends CellNode{
 	}
 	
 	public Edge(String version) {
-		currentVersion = version;
+		currentVariation = version;
 		scenes = new HashMap<>();
 		names = new HashMap<>();
 		disabled = new HashMap<>();
@@ -23,7 +23,7 @@ public class Edge extends CellNode{
 	
 	@Override
 	public String toString() {
-		return getName(currentVersion);
+		return getName(currentVariation);
 	}
 	
 }

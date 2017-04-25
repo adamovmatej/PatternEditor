@@ -11,7 +11,7 @@ public class State extends CellNode{
 	}
 	
 	public State(String name, String scene, Boolean disable, String version) {
-		currentVersion = version;
+		currentVariation = version;
 		scenes = new HashMap<>();
 		names = new HashMap<>();
 		disabled = new HashMap<>();
@@ -23,7 +23,7 @@ public class State extends CellNode{
 	
 	@Override
 	public String toString() {
-		return getName(currentVersion);
+		return getName(currentVariation);
 	}
 }
 

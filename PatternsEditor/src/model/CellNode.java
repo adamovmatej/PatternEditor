@@ -9,7 +9,7 @@ public abstract class CellNode implements Serializable, PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 	
-	protected String currentVersion;
+	protected String currentVariation;
 	protected Map<String, String> scenes;
 	protected Map<String, String> names;
 	protected Map<String, Boolean> disabled;
@@ -47,8 +47,8 @@ public abstract class CellNode implements Serializable, PropertyChangeListener {
 	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("versionChange") || evt.getPropertyName().equals("newVersion")){
-			currentVersion = ((Version) evt.getNewValue()).getVersion();
+		if (evt.getPropertyName().equals("variationChange") || evt.getPropertyName().equals("newVariation")){
+			currentVariation = ((Variation) evt.getNewValue()).getSecondaryPattern();
 		}
 	}	
 	

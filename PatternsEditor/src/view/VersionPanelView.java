@@ -35,19 +35,19 @@ public class VersionPanelView extends JSplitPane{
 
 	}
 
-	public JTable getMainTable() {
+	public JTable getVersionTable() {
 		return mainTable;
 	}
 
-	public void setMainTable(JTable mainTable) {
+	public void setVersionTable(JTable mainTable) {
 		this.mainTable = mainTable;
 	}
 
-	public JTable getVersionTable() {
+	public JTable getAdapterTable() {
 		return versionTable;
 	}
 
-	public void setVersionTable(JTable versionTable) {
+	public void setAdapterTable(JTable versionTable) {
 		this.versionTable = versionTable;
 	}
 

@@ -11,8 +11,9 @@ import javax.swing.text.TableView.TableRow;
 
 import model.Diagram;
 import model.DiagramModel;
+import model.Variation;
 import model.Version;
-import model.VersionModel;
+import model.VariationModel;
 import view.VersionPanelView;
 
 public class VersionPanelController implements PropertyChangeListener{
@@ -33,39 +34,37 @@ public class VersionPanelController implements PropertyChangeListener{
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("newDiagram")){
 			Diagram diagram = (Diagram) evt.getNewValue();
-			VersionModel versionModel = (VersionModel) evt.getOldValue();
-			view.getMainTable().setModel(versionModel.getMainTableModel());
-			view.getVersionTable().setModel(versionModel.getSecondaryTableModel());
-			selectTableRow(diagram.getCurrentVersion());
+			VariationModel versionModel = (VariationModel) evt.getOldValue();
+			view.getVersionTable().setModel(versionModel.getMainTableModel());
+			view.getAdapterTable().setModel(versionModel.getSecondaryTableModel());
+			selectTableRow(diagram.getCurrentVariation());
 			return;
 		}
-		if (evt.getPropertyName().equals("newVersion")){
-			Version version = (Version) evt.getNewValue();
-			selectTableRow(version);
+		if (evt.getPropertyName().equals("newVariation")){
+			Variation variation = (Variation) evt.getNewValue();
+			selectTableRow(variation);
 			return;
 		}
 		if (evt.getPropertyName().equals("changeDiagram")){
-			VersionModel versionModel = (VersionModel) evt.getNewValue();
-			view.getMainTable().setModel(versionModel.getMainTableModel());
-			view.getVersionTable().setModel(versionModel.getSecondaryTableModel());
+			VariationModel versionModel = (VariationModel) evt.getNewValue();
+			view.getVersionTable().setModel(versionModel.getMainTableModel());
+			view.getAdapterTable().setModel(versionModel.getSecondaryTableModel());
 			return;
 		}
 	}
 	
-	private void selectTableRow(Version version){
-		if (version.getMain()){
-			for (int i=0; i<view.getMainTable().getRowCount(); i++){
-				if (version.getVersion().equals(view.getMainTable().getValueAt(i, 0))){
-					view.getMainTable().setRowSelectionInterval(i, i);
-					//view.getVersionTable().clearSelection();
+	private void selectTableRow(Variation variation){
+		if (variation.getClass().equals(Version.class)){
+			for (int i=0; i<view.getVersionTable().getRowCount(); i++){
+				if (variation.getSecondaryPattern().equals(view.getVersionTable().getValueAt(i, 0))){
+					view.getVersionTable().setRowSelectionInterval(i, i);
 					return;
 				}
 			}
 		} else {
-			for (int i=0; i<view.getVersionTable().getRowCount(); i++){
-				if (version.getVersion().equals(view.getVersionTable().getValueAt(i, 0))){
-					view.getVersionTable().setRowSelectionInterval(i, i);
-					//view.getMainTable().clearSelection();
+			for (int i=0; i<view.getAdapterTable().getRowCount(); i++){
+				if (variation.getSecondaryPattern().equals(view.getAdapterTable().getValueAt(i, 0))){
+					view.getAdapterTable().setRowSelectionInterval(i, i);
 					return;
 				}
 			}
@@ -73,25 +72,25 @@ public class VersionPanelController implements PropertyChangeListener{
 	}
 	
 	private void initTables(){
-		view.getMainTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		view.getVersionTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		
-		view.getMainTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {			
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (view.getMainTable().getSelectedRow()!=-1){
-					view.getVersionTable().clearSelection();
-					model.changeVersion((String) view.getMainTable().getModel().getValueAt(view.getMainTable().getSelectedRow(), 0));					
-				}
-			}
-		});
+		view.getAdapterTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		view.getVersionTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (view.getVersionTable().getSelectedRow()!=-1){
-					view.getMainTable().clearSelection();
-					model.changeVersion((String) view.getVersionTable().getModel().getValueAt(view.getVersionTable().getSelectedRow(), 0));
+					view.getAdapterTable().clearSelection();
+					model.changeVersion((String) view.getVersionTable().getModel().getValueAt(view.getVersionTable().getSelectedRow(), 0));					
+				}
+			}
+		});
+		
+		view.getAdapterTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (view.getAdapterTable().getSelectedRow()!=-1){
+					view.getVersionTable().clearSelection();
+					model.changeAdapter((String) view.getAdapterTable().getModel().getValueAt(view.getAdapterTable().getSelectedRow(), 0));
 				}	
 			}
 		});

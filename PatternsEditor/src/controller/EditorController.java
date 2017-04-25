@@ -52,12 +52,12 @@ public class EditorController implements PropertyChangeListener{
 			insertDiagram(diagram);
 			return;
 		}
-		if (evt.getPropertyName().equals("newVersion")){
+		if (evt.getPropertyName().equals("newVariation")){
 			repaintCells(model.getCurrentDiagram());
 			view.getRightComponent().repaint();
 			return;
 		}
-		if (evt.getPropertyName().equals("versionChange")){
+		if (evt.getPropertyName().equals("variationChange")){
 			repaintCells(model.getCurrentDiagram());
 			view.getRightComponent().repaint();
 			return;
@@ -70,15 +70,15 @@ public class EditorController implements PropertyChangeListener{
 		if (cell.isEdge()){
 			Object obj = cell.getValue();
 			if (obj.getClass() == String.class){
-				cell.setValue(new Edge(diagram.getCurrentVersion().getVersion()));
+				cell.setValue(new Edge(diagram.getCurrentVariation().getSecondaryPattern()));
 			}
 			Edge edge = (Edge) cell.getValue();
-			String version = diagram.getCurrentVersion().getVersion();
+			String version = diagram.getCurrentVariation().getSecondaryPattern();
 			EdgePropertiesDialog dialog = new EdgePropertiesDialog(this, edge.getName(version), edge.getScene(version), me);
 			dialog.setVisible(true);
 		} else{
 			State state = (State) cell.getValue();
-			String version = diagram.getCurrentVersion().getVersion();
+			String version = diagram.getCurrentVariation().getSecondaryPattern();
 			StatePropertiesDialog dialog = new StatePropertiesDialog(this, state.getName(version), state.getScene(version),state.getDisable(version), false, me);
 			dialog.setVisible(true);
 		}
@@ -93,13 +93,13 @@ public class EditorController implements PropertyChangeListener{
 	public void createState(String name, String scene, Boolean disable, MouseEvent me) {
 		Diagram diagram = (Diagram)view.getMap().getSelectedComponent();
 		mxGraph graph = diagram.getGraph();
-		State state = new State(name, scene, disable, diagram.getCurrentVersion().getVersion());
+		State state = new State(name, scene, disable, diagram.getCurrentVariation().getSecondaryPattern());
 		model.addListener(state);
 		
 		graph.getModel().beginUpdate();
 		try{
 			mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, state, me.getX(), me.getY(), 100, 50);
-			paintCell(cell, diagram.getCurrentVersion().getVersion());
+			paintCell(cell, diagram.getCurrentVariation().getSecondaryPattern());
 		} finally{
 			graph.getModel().endUpdate();
 		}			
@@ -119,8 +119,8 @@ public class EditorController implements PropertyChangeListener{
 			if (state == null){
 				state = new State();
 			}
-			state.update(name, scene, diagram.getCurrentVersion().getVersion(), disable);
-			paintCell(cell, diagram.getCurrentVersion().getVersion());
+			state.update(name, scene, diagram.getCurrentVariation().getSecondaryPattern(), disable);
+			paintCell(cell, diagram.getCurrentVariation().getSecondaryPattern());
 		} finally{
 			graph.getModel().endUpdate();
 		}
@@ -139,7 +139,7 @@ public class EditorController implements PropertyChangeListener{
 	
 	private void repaintCells(Diagram diagram){
 		for (Object cell : diagram.getGraph().getChildVertices(diagram.getGraph().getDefaultParent())) {
-			paintCell((mxCell) cell, diagram.getCurrentVersion().getVersion());
+			paintCell((mxCell) cell, diagram.getCurrentVariation().getSecondaryPattern());
 		}
 	}
 	
@@ -186,7 +186,7 @@ public class EditorController implements PropertyChangeListener{
 		Diagram diagram = model.getCurrentDiagram();
 		
 		State state = (State) ((mxCell)(diagram.getCellAt(me.getX(), me.getY()))).getValue();
-		String version = diagram.getCurrentVersion().getVersion();
+		String version = diagram.getCurrentVariation().getSecondaryPattern();
 		StatePropertiesDialog dialog = new StatePropertiesDialog(this, state.getName(version), state.getScene(version),state.getDisable(version), false, me);
 		dialog.setVisible(true);
 	}
@@ -199,7 +199,7 @@ public class EditorController implements PropertyChangeListener{
 		try{
 			mxCell cell = (mxCell) (((Diagram) (view.getMap().getSelectedComponent())).getCellAt(me.getX(), me.getY()));
 			Edge edge = (Edge) cell.getValue();
-			edge.update(name, scene, diagram.getCurrentVersion().getVersion());
+			edge.update(name, scene, diagram.getCurrentVariation().getSecondaryPattern());
 		} finally{
 			graph.getModel().endUpdate();
 		}

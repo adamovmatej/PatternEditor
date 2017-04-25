@@ -10,7 +10,7 @@ import javax.swing.event.ListSelectionListener;
 import model.Diagram;
 import model.Pattern;
 import model.PatternModel;
-import model.VersionModel;
+import model.VariationModel;
 import view.PatternsOverView;
 
 public class PatternOverviewController implements PropertyChangeListener{

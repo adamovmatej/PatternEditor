@@ -1,53 +1,66 @@
 package controller;
 
 
-import javax.swing.JComboBox;
+import java.util.Locale;
 
-import controller.listener.MainFrameListener;
+import javax.swing.JComboBox;
+import javax.swing.JTable;
+
 import model.DiagramModel;
 import model.PatternModel;
 import view.MainScreen;
-import view.PatternsOverView;
-import view.dialog.DiagramDialog;
+import view.dialog.PatternChooser;
 import view.dialog.PatternDialog;
 
 public class MainScreenController {
+	
+	private Locale currentLocale;
 
 	private MainScreen view;
 	private DiagramModel diagramModel;
 	private PatternModel patternModel;
-	private PatternOverviewController controller;
+	private PatternOverviewController oveviewController;
 	
 	
 	public MainScreenController(MainScreen mainScreen, DiagramModel diagramModel, PatternModel patternModel, PatternOverviewController patternOverviewController) {
+		setCurrentLocale(Locale.ENGLISH);
+		
 		this.view = mainScreen;
-		view.addWindowListener(new MainFrameListener());
-		this.controller = patternOverviewController;
+		this.oveviewController = patternOverviewController;
 		this.diagramModel = diagramModel;
 		this.patternModel = patternModel;
 	}
 	
 	public void createNewDiagramDialog(){
-		DiagramDialog dialog = new DiagramDialog(this, "diagram");
+		PatternChooser dialog = new PatternChooser(this, "diagram", currentLocale);
 		dialog.setVisible(true);		
 	}
 	
-	public void createDiagram(String name, String version, Boolean main){
-		diagramModel.createDiagram(name, version, main);
+	public void createDiagram(String pattern){
+		diagramModel.createDiagram(pattern);
 	}
 	
 	public void createNewVersionDialog() {
-		DiagramDialog dialog = new DiagramDialog(this, "version");
-		dialog.getPatternComboBox().setEnabled(false);
+		PatternChooser dialog = new PatternChooser(this, "version", currentLocale);
+		
 		dialog.setVisible(true);
 	}
 	
-	public void createNewVersion(String name, String version, Boolean main) {
-		diagramModel.createVersion(name, version, main);
+	public void createVersion(String pattern) {
+		diagramModel.createVersion(pattern);
+	}
+	
+	public void createNewAdapterDialog(){
+		PatternChooser dialog = new PatternChooser(this, "adapter", currentLocale);
+		dialog.setVisible(true);		
+	}
+	
+	public void createAdapter(String pattern){
+		diagramModel.createAdapter(pattern);
 	}
 	
 	public void createNewPatternDialog() {
-		PatternDialog dialog = new PatternDialog(this, "new");
+		PatternDialog dialog = new PatternDialog(this, "new", currentLocale);
 		dialog.setVisible(true);
 	}
 
@@ -79,6 +92,18 @@ public class MainScreenController {
 	}
 
 	public void showPatternOverview() {
-		controller.showPatternOverview();
+		oveviewController.showPatternOverview();
+	}
+
+	public Locale getCurrentLocale() {
+		return currentLocale;
+	}
+
+	public void setCurrentLocale(Locale currentLocale) {
+		this.currentLocale = currentLocale;
+	}
+
+	public void populateTable(JTable table) {
+		table.setModel(patternModel.generateTableModel());
 	}
 }

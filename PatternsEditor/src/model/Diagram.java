@@ -1,7 +1,9 @@
 package model;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.mxgraph.swing.mxGraphComponent;
@@ -12,88 +14,72 @@ public class Diagram extends mxGraphComponent{
 
 	private static final long serialVersionUID = 1L;
 	
-	private Boolean hasFile = false;
-	private File file = null;
 	private String pattern;
-	private Version currentVersion;
+	private Variation currentVariation;
 	private Boolean main;
 	private Map<String, Version> versions;
+	private Map<String, Adapter> adapters;
   	private mxRubberband rubberband;
 	
-	public Diagram(mxGraph graph, String pattern, String version, Boolean main) {
+  	public Diagram(mxGraph graph, String pattern) {
 		super(graph);
-		
-		this.pattern = pattern;	
-		currentVersion = new Version(pattern, version, main);
-		this.versions = new HashMap<String, Version>();
-		versions.put(version, currentVersion);
 		this.getGraph().setAllowDanglingEdges(false);
-		this.graph.setCellsDeletable(true);
 		this.rubberband = new mxRubberband(this);
-	}
-	
-	private void addVersion(Version version){
-		versions.put(version.getVersion(), version);
-	}
+		this.graph.setCellsDeletable(true);
+
+		this.pattern = pattern;	
+		this.versions = new HashMap<>();
+		this.adapters = new HashMap<>();
+		
+		Version version = new Version(pattern, "Default");
+		setCurrentVariation(version);
+		versions.put("Default", version);
+  	}
 
 	public void changeVersion(String name) {
-		currentVersion = getVersion(name);
+		setCurrentVariation(getVersion(name));
+		graph.refresh();
+		graph.repaint();
+	}
+	
+	public void changeAdapter(String name) {
+		setCurrentVariation(getAdapter(name));
 		graph.refresh();
 		graph.repaint();
 	}
 
-	public void setCurrentFile(File file) {
-		this.file = file;
+	public void addVersion(Version version) {
+		setCurrentVariation(version);
+		versions.put(version.getMainPattern(), version);
 	}
-
-	public File getFile() {
-		return file;
-	}
-
-	public void setFile(File file) {
-		this.file = file;
-	}
-
-	public Boolean getHasFile() {
-		return hasFile;
-	}
-
-	public void setHasFile(Boolean hasFile) {
-		this.hasFile = hasFile;
+	
+	public void addAdapter(Adapter adapter) {
+		setCurrentVariation(adapter);
+		adapters.put(adapter.getMainPattern(), adapter);
 	}
 
 	public String getPattern() {
 		return pattern;
 	}
 
-	public void setPattern(String name) {
-		this.pattern = name;
-	}
-
-	public Version getCurrentVersion() {
-		return currentVersion;
-	}
-
-	public void setCurrentVersion(Version version) {
-		this.currentVersion = version;
-	}
-
-	public Boolean getMain() {
-		return main;
-	}
-
-	public void setMain(Boolean main) {
-		this.main = main;
-	}
-
-	public void createVersion(Version version) {
-		addVersion(version);
-		setCurrentVersion(version);
-		
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
 	}
 	
-	public Version getVersion(String name){
-		return versions.get(name);
+	private Version getVersion(String key){
+		return versions.get(key);
+	}
+
+	private Variation getAdapter(String key) {
+		return adapters.get(key);
+	}
+
+	public Variation getCurrentVariation() {
+		return currentVariation;
+	}
+
+	public void setCurrentVariation(Variation currentVariation) {
+		this.currentVariation = currentVariation;
 	}
 
 	public Map<String, Version> getVersions() {
@@ -103,4 +89,13 @@ public class Diagram extends mxGraphComponent{
 	public void setVersions(Map<String, Version> versions) {
 		this.versions = versions;
 	}
+
+	public Map<String, Adapter> getAdapters() {
+		return adapters;
+	}
+
+	public void setAdapters(Map<String, Adapter> adapters) {
+		this.adapters = adapters;
+	}
+
 }

@@ -2,6 +2,9 @@ package view.menu;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -9,27 +12,30 @@ import javax.swing.JMenuItem;
 import controller.MainScreenController;
 
 public class MainMenuBar extends JMenuBar{
+	
 
+	private Locale currentLocale;
+	
 	private static final long serialVersionUID = 1L;
 
 	private MainScreenController controller;
 	
-	private JMenu file = new JMenu("File");
-	private JMenuItem newPattern = new JMenuItem("New Pattern");
-	private JMenuItem newDiagram = new JMenuItem("New Diagram");
-	private JMenuItem newVersion = new JMenuItem("New Version");
-	private JMenuItem patternOverView = new JMenuItem("Pattern Overview");
-	private JMenuItem save = new JMenuItem("Save");
-	private JMenuItem saveAs = new JMenuItem("Save as");
-	private JMenuItem open = new JMenuItem("Open");	
+	private JMenu file = new JMenu();
+	private JMenu edit = new JMenu();
+	private JMenu help = new JMenu();
+	private JMenu preferences = new JMenu();
 	
-	private JMenu edit = new JMenu("Edit");
-	private JMenu help = new JMenu("Help");
-	
-	private JFileChooser fc = new JFileChooser();
-	
+	private JMenuItem newPattern = new JMenuItem();
+	private JMenuItem newDiagram = new JMenuItem();
+	private JMenuItem newVersion = new JMenuItem();
+	private JMenuItem newAdapter = new JMenuItem();
+	private JMenuItem patternOverView = new JMenuItem();
+	private JMenuItem save = new JMenuItem();
+	private JMenuItem saveAs = new JMenuItem();
+	private JMenuItem open = new JMenuItem();	
+		
 	public MainMenuBar() {
-				
+		
 		newPattern.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -48,6 +54,13 @@ public class MainMenuBar extends JMenuBar{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				controller.createNewVersionDialog();
+			}
+		});
+		
+		newAdapter.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.createNewAdapterDialog();
 			}
 		});
 		
@@ -74,9 +87,11 @@ public class MainMenuBar extends JMenuBar{
 			}
 		});
 		
-		file.add(newDiagram);
-		file.add(newVersion);
 		file.add(newPattern);
+		file.add(newDiagram);
+		file.addSeparator();
+		file.add(newVersion);
+		file.add(newAdapter);
 		file.addSeparator();
 		file.add(patternOverView);
 		file.addSeparator();
@@ -95,5 +110,25 @@ public class MainMenuBar extends JMenuBar{
 
 	public void setController(MainScreenController controller) {
 		this.controller = controller;
+		this.currentLocale = controller.getCurrentLocale();
+		initText();
+	}
+	
+	private void initText(){
+		ResourceBundle bundle = ResourceBundle.getBundle("TextBundle", currentLocale);	
+		
+		file.setText(bundle.getString("menu.file"));
+		edit.setText(bundle.getString("menu.edit"));
+		help.setText(bundle.getString("menu.help"));
+		preferences.setText(bundle.getString("menu.preferences"));
+		
+		newPattern.setText(bundle.getString("menu.newPattern"));
+		newDiagram.setText(bundle.getString("menu.newDiagram"));
+		newVersion.setText(bundle.getString("menu.newVersion"));
+		newAdapter.setText(bundle.getString("menu.newAdapter"));
+		patternOverView.setText(bundle.getString("menu.patternOverView"));
+		save.setText(bundle.getString("menu.save"));
+		saveAs.setText(bundle.getString("menu.saveAs"));
+		open.setText(bundle.getString("menu.open"));
 	}
 }

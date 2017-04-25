@@ -7,6 +7,7 @@ import controller.listener.MainFrameListener;
 import model.DiagramModel;
 import model.PatternModel;
 import view.MainScreen;
+import view.PatternsOverView;
 import view.dialog.DiagramDialog;
 import view.dialog.PatternDialog;
 
@@ -15,11 +16,13 @@ public class MainScreenController {
 	private MainScreen view;
 	private DiagramModel diagramModel;
 	private PatternModel patternModel;
+	private PatternOverviewController controller;
 	
 	
-	public MainScreenController(MainScreen mainScreen, DiagramModel diagramModel, PatternModel patternModel) {
+	public MainScreenController(MainScreen mainScreen, DiagramModel diagramModel, PatternModel patternModel, PatternOverviewController patternOverviewController) {
 		this.view = mainScreen;
 		view.addWindowListener(new MainFrameListener());
+		this.controller = patternOverviewController;
 		this.diagramModel = diagramModel;
 		this.patternModel = patternModel;
 	}
@@ -52,7 +55,9 @@ public class MainScreenController {
 		for (String str : patternModel.getPatterns()) {
 			comboBox.addItem(str);
 		}
-		comboBox.setSelectedIndex(0);
+		if (comboBox.getItemCount()>0){
+			comboBox.setSelectedIndex(0);			
+		}
 	}
 
 	public DiagramModel getDiagramModel() {
@@ -71,5 +76,9 @@ public class MainScreenController {
 	public void updatePattern(String name, String desc) {
 		// TODO Auto-generated method stub
 				
+	}
+
+	public void showPatternOverview() {
+		controller.showPatternOverview();
 	}
 }

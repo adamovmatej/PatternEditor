@@ -18,6 +18,7 @@ public class MainMenuBar extends JMenuBar{
 	private JMenuItem newPattern = new JMenuItem("New Pattern");
 	private JMenuItem newDiagram = new JMenuItem("New Diagram");
 	private JMenuItem newVersion = new JMenuItem("New Version");
+	private JMenuItem patternOverView = new JMenuItem("Pattern Overview");
 	private JMenuItem save = new JMenuItem("Save");
 	private JMenuItem saveAs = new JMenuItem("Save as");
 	private JMenuItem open = new JMenuItem("Open");	
@@ -50,6 +51,13 @@ public class MainMenuBar extends JMenuBar{
 			}
 		});
 		
+		patternOverView.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.showPatternOverview();
+			}
+		});
+		
 		save.addActionListener(new ActionListener() {
 			
 			@Override
@@ -69,6 +77,8 @@ public class MainMenuBar extends JMenuBar{
 		file.add(newDiagram);
 		file.add(newVersion);
 		file.add(newPattern);
+		file.addSeparator();
+		file.add(patternOverView);
 		file.addSeparator();
 		file.add(save);
 		file.add(saveAs);

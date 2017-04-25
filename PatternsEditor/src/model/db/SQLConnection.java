@@ -23,9 +23,8 @@ public final class SQLConnection {
             System.out.println("Connection to SQLite has been established.");
             String dropTable = "DROP TABLE pattern";
     		String patternTable = "CREATE TABLE IF NOT EXISTS pattern (\n"
-                    + "	id INTEGER PRIMARY KEY,\n"
+                    + "	name TEXT PRIMARY KEY,\n"
                     + " diagramId INTEGER,\n"
-    				+ " name TEXT NOT NULL,\n"
                     + " description TEXT,\n"
                     + " FOREIGN KEY(diagramId) REFERENCES diagram(id)"
                     + ");";
@@ -41,6 +40,13 @@ public final class SQLConnection {
     	            + " FOREIGN KEY(mainPatternId) REFERENCES pattern(id),\n"
     	            + " FOREIGN KEY(secondaryPatternId) REFERENCES pattern(id)"
     	            + ");";
+    		String versionTable = "CREATE TABLE IF NOT EXISTS version (\n"
+    				+ " id INTEGER PRIMARY KEY,\n"
+    				+ " mainPatternId INTEGER,\n"
+    				+ " secondaryPatternId INTEGER,\n"
+    	            + " FOREIGN KEY(mainPatternId) REFERENCES pattern(id),\n"
+    	            + " FOREIGN KEY(secondaryPatternId) REFERENCES pattern(id)"
+    	            + ");";
     		
     		Statement stmt;
     		try {
@@ -49,6 +55,7 @@ public final class SQLConnection {
     			stmt.execute(patternTable);
     			stmt.execute(diagramTable);
     			stmt.execute(adapterTable);
+    			stmt.execute(versionTable);
     		} catch (SQLException e) {
     			System.out.println(e.getMessage());
     		}

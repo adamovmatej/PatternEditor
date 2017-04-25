@@ -5,6 +5,7 @@ import com.mxgraph.io.mxObjectCodec;
 
 import controller.EditorController;
 import controller.MainScreenController;
+import controller.PatternOverviewController;
 import controller.VersionPanelController;
 import model.DiagramModel;
 import model.Edge;
@@ -35,7 +36,8 @@ public class Main {
 		
 		EditorController editorController = new EditorController(editorView, diagramModel);
 		VersionPanelController versionPanelController = new VersionPanelController(versionPanelView, diagramModel);
-		MainScreenController mainScreenController = new MainScreenController(mainScreen, diagramModel, patternModel);
+		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel);
+		MainScreenController mainScreenController = new MainScreenController(mainScreen, diagramModel, patternModel, patternOverviewController);
 		
 		versionPanelView.setController(versionPanelController);
 		editorView.setController(editorController);

@@ -1,6 +1,8 @@
 package controller;
 
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Locale;
 
 import javax.swing.JComboBox;
@@ -11,21 +13,26 @@ import model.PatternModel;
 import view.MainScreen;
 import view.dialog.PatternChooser;
 import view.dialog.PatternDialog;
+import view.menu.MainMenuBar;
 
-public class MainScreenController {
+public class MainScreenController implements PropertyChangeListener{
 	
 	private Locale currentLocale;
 
 	private MainScreen view;
+	private MainMenuBar bar;
 	private DiagramModel diagramModel;
 	private PatternModel patternModel;
 	private PatternOverviewController oveviewController;
 	
 	
-	public MainScreenController(MainScreen mainScreen, DiagramModel diagramModel, PatternModel patternModel, PatternOverviewController patternOverviewController) {
+	public MainScreenController(MainScreen mainScreen, MainMenuBar bar, DiagramModel diagramModel, PatternModel patternModel, PatternOverviewController patternOverviewController) {
 		setCurrentLocale(Locale.ENGLISH);
 		
+		diagramModel.addListener(this);
+		
 		this.view = mainScreen;
+		this.bar = bar;
 		this.oveviewController = patternOverviewController;
 		this.diagramModel = diagramModel;
 		this.patternModel = patternModel;
@@ -57,6 +64,15 @@ public class MainScreenController {
 	
 	public void createAdapter(String pattern){
 		diagramModel.createAdapter(pattern);
+	}
+	
+	public void createOpenDiagramDialog() {
+		PatternChooser dialog = new PatternChooser(this, "open", currentLocale);
+		dialog.setVisible(true);
+	}
+	
+	public void openDiagram(String pattern){
+		diagramModel.open(pattern);
 	}
 	
 	public void createNewPatternDialog() {
@@ -105,5 +121,21 @@ public class MainScreenController {
 
 	public void populateTable(JTable table) {
 		table.setModel(patternModel.generateTableModel());
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if (evt.getPropertyName().equals("changeDiagram") || evt.getPropertyName().equals("newDiagram")){
+			if (evt.getOldValue() == null){
+				bar.chceckDiagramItems(false);
+			} else {
+				bar.chceckDiagramItems(true);
+			}
+			return;
+		}
+	}
+
+	public void saveDiagram() {
+		diagramModel.save();
 	}
 }

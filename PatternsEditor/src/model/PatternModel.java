@@ -118,7 +118,7 @@ public class PatternModel {
 	}
 	
 	private void dbUpdatePattern(String name, String newName, String description){
-		 String sql = "UPDATE pattern SET name = ? , "
+		String sql = "UPDATE pattern SET name = ? , "
 	                + "description = ? "
 	                + "WHERE name = ?";
 		Connection connection = SQLConnection.getInstance().getConnection();

@@ -48,6 +48,7 @@ public class StatePropertiesDialog extends JDialog {
 		getContentPane().add(sceneText);
 		
 		JCheckBox disableCheckBox = new JCheckBox("Disabled:");
+		System.out.println(disable);
 		disableCheckBox.setSelected(disable);
 		disableCheckBox.setBounds(3, 58, 129, 23);
 		getContentPane().add(disableCheckBox);

@@ -14,7 +14,6 @@ public class KeyMapListener extends KeyAdapter{
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		System.out.println("halo");
 		if (e.getKeyCode() == KeyEvent.VK_DELETE){
 			controller.createDeleteDialog();
 		}

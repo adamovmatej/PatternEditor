@@ -1,14 +1,23 @@
 package model;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.w3c.dom.Document;
+
+import com.mxgraph.io.mxCodec;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxRubberband;
+import com.mxgraph.util.mxXmlUtils;
 import com.mxgraph.view.mxGraph;
+
+import model.db.SQLConnection;
 
 public class Diagram extends mxGraphComponent{
 
@@ -16,28 +25,31 @@ public class Diagram extends mxGraphComponent{
 	
 	private String pattern;
 	private Variation currentVariation;
-	private Boolean main;
 	private Map<String, Version> versions;
 	private Map<String, Adapter> adapters;
   	private mxRubberband rubberband;
-	
-  	public Diagram(mxGraph graph, String pattern) {
+	  	
+  	public Diagram(mxGraph graph, String pattern, VariationModel model) {
 		super(graph);
 		this.getGraph().setAllowDanglingEdges(false);
+		this.getGraph().setCellsEditable(false);
 		this.rubberband = new mxRubberband(this);
 		this.graph.setCellsDeletable(true);
 
-		this.pattern = pattern;	
+		this.pattern = pattern;
 		this.versions = new HashMap<>();
 		this.adapters = new HashMap<>();
 		
-		Version version = new Version(pattern, "Default");
-		setCurrentVariation(version);
-		versions.put("Default", version);
+		if (model == null){
+			addVersion(new Version(pattern, "Default"));			
+		} else {
+			initVariations(model);
+		}
   	}
 
 	public void changeVersion(String name) {
 		setCurrentVariation(getVersion(name));
+		System.out.println(currentVariation.getSecondaryPattern());
 		graph.refresh();
 		graph.repaint();
 	}
@@ -50,13 +62,93 @@ public class Diagram extends mxGraphComponent{
 
 	public void addVersion(Version version) {
 		setCurrentVariation(version);
-		versions.put(version.getMainPattern(), version);
+		versions.put(version.getSecondaryPattern(), version);
+		dbSaveVersion(version);
 	}
 	
 	public void addAdapter(Adapter adapter) {
 		setCurrentVariation(adapter);
-		adapters.put(adapter.getMainPattern(), adapter);
+		adapters.put(adapter.getSecondaryPattern(), adapter);
+		dbSaveAdapter(adapter);
 	}
+	
+	public String getXml(){
+		mxCodec codec = new mxCodec();
+		String xml = null;
+		try {
+			xml = URLEncoder.encode(mxXmlUtils.getXml(codec.encode(graph.getModel())), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}	
+		return xml;
+	}
+	
+	public void xmlIn(String xml){
+		Document document;
+		try {
+			document = mxXmlUtils.parseXml(URLDecoder.decode(xml, "UTF-8"));
+			mxCodec codec = new mxCodec(document);
+			codec.decode(document.getDocumentElement(), graph.getModel());	
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void initVariations(VariationModel model){
+		String variation;
+		for (int i = 0; i < model.getMainTableModel().getRowCount(); i++){
+			variation = (String) model.getMainTableModel().getValueAt(i, 0);
+			versions.put(variation, new Version(pattern, variation));
+		}
+		for (int i = 0; i < model.getSecondaryTableModel().getRowCount(); i++){
+			variation = (String) model.getSecondaryTableModel().getValueAt(i, 0);
+			adapters.put(variation, new Adapter(pattern, variation));
+		}
+		currentVariation = versions.get("Default");
+		System.out.println(currentVariation.getSecondaryPattern());
+	}
+	
+	private void dbSaveVersion(Version version){
+		String sql = "INSERT INTO version(mainPattern,secondaryPattern) VALUES(?,?)";
+		Connection connection = SQLConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, version.getMainPattern());
+            pstmt.setString(2, version.getSecondaryPattern());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+        	System.out.println(sql);
+            System.out.println(e.getMessage());
+        } finally {
+        	try {
+        		if (connection != null){
+        			connection.close();
+        		}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+        }
+	}
+	
+	private void dbSaveAdapter(Adapter adapter){
+		String sql = "INSERT INTO adapter(mainPattern,secondaryPattern) VALUES(?,?)";
+		Connection connection = SQLConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, adapter.getMainPattern());
+            pstmt.setString(2, adapter.getSecondaryPattern());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+        	System.out.println(sql);
+            System.out.println(e.getMessage());
+        } finally {
+        	try {
+        		if (connection != null){
+        			connection.close();
+        		}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+        }
+	}	
 
 	public String getPattern() {
 		return pattern;

@@ -1,8 +1,14 @@
 package model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
+
+import model.db.SQLConnection;
 
 public class VariationModel {	
 	
@@ -11,6 +17,10 @@ public class VariationModel {
 	
 	public VariationModel(Diagram diagram) {
 		initTables(diagram);
+	}
+	
+	public VariationModel(String pattern, Connection connection){
+		initTables(pattern, connection);
 	}
 	
 	private void initTables(Diagram diagram){
@@ -24,6 +34,39 @@ public class VariationModel {
 		for (String key : adapterMap.keySet()) {
 			adapterTableModel.addRow(new Object[]{key});
 		}
+	}
+	
+	private void initTables(String pattern, Connection connection){
+		versionTableModel = new DefaultTableModel(new Object[]{"Versions:"},0);
+		adapterTableModel = new DefaultTableModel(new Object[]{"Adapters:"},0);
+		
+		String sqlVer = "SELECT secondaryPattern FROM version WHERE mainPattern = ?";
+		String sqlAda = "SELECT secondaryPattern FROM adapter WHERE mainPattern = ?";
+        try (PreparedStatement pstmtVer = connection.prepareStatement(sqlVer); PreparedStatement pstmtAda = connection.prepareStatement(sqlAda)) {
+        	connection.setAutoCommit(false);
+            pstmtVer.setString(1, pattern);
+            ResultSet rs1 = pstmtVer.executeQuery();
+            while (rs1.next()){
+            	versionTableModel.addRow(new Object[]{rs1.getString("secondaryPattern")});
+            }
+            pstmtAda.setString(1, pattern);
+            ResultSet rs2 = pstmtAda.executeQuery();
+            while (rs2.next()){
+            	adapterTableModel.addRow(new Object[]{rs2.getString("secondaryPattern")});
+            }
+        } catch (SQLException e) {
+        	System.out.println(sqlVer);
+            System.out.println(e.getMessage());
+        } finally {
+        	try {
+        		if (connection != null){
+        			connection.commit();
+        			connection.close();
+        		}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+        }
 	}
 	
 	public DefaultTableModel getMainTableModel() {

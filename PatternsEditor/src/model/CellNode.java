@@ -5,7 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.Map;
 
-public abstract class CellNode implements Serializable, PropertyChangeListener {
+public class CellNode implements Serializable, PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 	

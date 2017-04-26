@@ -1,12 +1,18 @@
 package model;
 
 import java.beans.PropertyChangeListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.event.SwingPropertyChangeSupport;
 
 import com.mxgraph.view.mxGraph;
+
+import model.db.SQLConnection;
 
 public class DiagramModel {
 	
@@ -23,7 +29,7 @@ public class DiagramModel {
 	}
 	
 	public void createDiagram(String name){
-		currentDiagram = new Diagram(new mxGraph(), name);
+		currentDiagram = new Diagram(new mxGraph(), name, null);
 		diagrams.put(name, currentDiagram);
 		VariationModel variationModel = new VariationModel(currentDiagram);
 		variationModels.put(name, variationModel);
@@ -93,6 +99,71 @@ public class DiagramModel {
 			return;
 		}
 		this.currentDiagram = currentDiagram;
-		propertyChangeSupport.firePropertyChange("changeDiagram", null, variationModels.get(currentDiagram.getPattern()));
+		VariationModel model = null;
+		if (currentDiagram != null){
+			model = variationModels.get(currentDiagram.getPattern());
+		}
+		propertyChangeSupport.firePropertyChange("changeDiagram", currentDiagram, model);
+	}
+
+	public void closeDiagram(Diagram diagram) {
+		diagrams.remove(diagram.getPattern());
+	}
+	
+	public void save() {
+		Connection connection = SQLConnection.getInstance().getConnection();
+		String sql = "UPDATE pattern SET xml = ? "
+                + "WHERE name = ?";	
+		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {	
+			pstmt.setString(1, currentDiagram.getXml());
+			pstmt.setString(2, currentDiagram.getPattern());
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println(sql);
+        	System.out.println(e.getMessage());
+		} finally {
+			try {
+				if (connection != null){
+					connection.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		//TODO
+		//propertyChangeSupport.firePropertyChange("patternUpdate", name, new Pattern(newName, description));
+	}
+	
+	public void saveAll() {
+		//TODO
+	}
+	
+	public void open(String pattern){
+		String sql = "SELECT xml FROM pattern WHERE name = ?";
+		Connection connection = SQLConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, pattern);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()){
+            	String xml = rs.getString("xml");
+            	VariationModel variationModel = new VariationModel(pattern, connection);
+            	variationModels.put(pattern, variationModel);
+            	currentDiagram = new Diagram(new mxGraph(), pattern, variationModel);
+            	currentDiagram.xmlIn(xml);
+            	diagrams.put(pattern, currentDiagram);
+        		propertyChangeSupport.firePropertyChange("newDiagram", variationModel, currentDiagram);
+            }
+        } catch (SQLException e) {
+        	System.out.println(sql);
+            System.out.println(e.getMessage());
+        } finally {
+        	try {
+        		if (connection != null){
+        			connection.close();
+        		}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+        }
 	}
 }

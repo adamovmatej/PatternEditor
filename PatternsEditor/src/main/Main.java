@@ -23,7 +23,7 @@ public class Main {
 		
 		SQLConnection.getInstance().initDatabase();
 		
-		mxCodecRegistry.register(new mxObjectCodec(new State()));	
+		mxCodecRegistry.register(new mxObjectCodec(new State()));
 		mxCodecRegistry.register(new mxObjectCodec(new Edge()));
 		
 		MainMenuBar mainMenuBar = new MainMenuBar();
@@ -37,7 +37,7 @@ public class Main {
 		EditorController editorController = new EditorController(editorView, diagramModel);
 		VersionPanelController versionPanelController = new VersionPanelController(versionPanelView, diagramModel);
 		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel);
-		MainScreenController mainScreenController = new MainScreenController(mainScreen, diagramModel, patternModel, patternOverviewController);
+		MainScreenController mainScreenController = new MainScreenController(mainScreen, mainMenuBar, diagramModel, patternModel, patternOverviewController);
 		
 		versionPanelView.setController(versionPanelController);
 		editorView.setController(editorController);

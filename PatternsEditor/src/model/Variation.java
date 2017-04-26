@@ -2,11 +2,15 @@ package model;
 
 import java.io.Serializable;
 
-public abstract class Variation implements Serializable{
+public class Variation implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private String mainPattern;
 	private String secondaryPattern;
+	
+	
+	public Variation() {		
+	}
 	
 	public Variation(String mainPattern, String secondaryPattern) {
 		this.setMainPattern(mainPattern);
@@ -27,6 +31,5 @@ public abstract class Variation implements Serializable{
 
 	public void setSecondaryPattern(String secondaryPattern) {
 		this.secondaryPattern = secondaryPattern;
-	}
-	
+	}	
 }

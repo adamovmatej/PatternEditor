@@ -10,11 +10,10 @@ public class EditorView extends JSplitPane {
 		
 	private EditorController controller;
 	
-	private JTabbedPane map;
+	private CustomTabPane map;
 	
 	public EditorView(VersionPanelView versionPanelView) {		
-		map = new JTabbedPane();
-		
+		map = new CustomTabPane();		
 		setRightComponent(map);
 		setLeftComponent(versionPanelView);
 		resetDivider();
@@ -27,13 +26,14 @@ public class EditorView extends JSplitPane {
 
 	public void setController(EditorController controller) {
 		this.controller = controller;
+		map.setController(controller);
 	}
 
-	public JTabbedPane getMap() {
+	public CustomTabPane getMap() {
 		return map;
 	}
 
-	public void setMap(JTabbedPane map) {
+	public void setMap(CustomTabPane map) {
 		this.map = map;
 	}
 	

@@ -1,5 +1,6 @@
 package controller;
 
+import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -20,6 +21,7 @@ import model.Diagram;
 import model.DiagramModel;
 import model.Edge;
 import model.State;
+import view.CustomTabPane;
 import view.EditorView;
 import view.VersionPanelView;
 import view.dialog.EdgePropertiesDialog;
@@ -35,10 +37,14 @@ public class EditorController implements PropertyChangeListener{
 	public EditorController(EditorView view, DiagramModel model) {
 		this.view = view;
 		this.model = model;
-		((JTabbedPane)view.getRightComponent()).addChangeListener(new ChangeListener() {			
+		((CustomTabPane)view.getRightComponent()).addChangeListener(new ChangeListener() {			
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				model.setCurrentDiagram((Diagram) view.getMap().getComponentAt(view.getMap().getSelectedIndex()));
+				if (((CustomTabPane)view.getRightComponent()).getTabCount()>0){
+					model.setCurrentDiagram((Diagram) view.getMap().getComponentAt(view.getMap().getSelectedIndex()));					
+				} else {
+					model.setCurrentDiagram(null);
+				}
 			}
 		});
 		model.addListener(this);
@@ -62,6 +68,11 @@ public class EditorController implements PropertyChangeListener{
 			view.getRightComponent().repaint();
 			return;
 		}
+	}
+	
+	public void removeTab(Component tab){
+		Diagram diagram = (Diagram) tab;
+		model.closeDiagram(diagram);
 	}
 	
 	public void createPropertiesDialog(MouseEvent me){

@@ -22,7 +22,7 @@ public class VersionPanelController implements PropertyChangeListener{
 	private DiagramModel model;
 	
 	public VersionPanelController(VersionPanelView view, DiagramModel model) {
-		this.view = view;	
+		this.view = view;
 		this.model = model;
 		
 		initTables();
@@ -46,9 +46,14 @@ public class VersionPanelController implements PropertyChangeListener{
 			return;
 		}
 		if (evt.getPropertyName().equals("changeDiagram")){
-			VariationModel versionModel = (VariationModel) evt.getNewValue();
-			view.getVersionTable().setModel(versionModel.getMainTableModel());
-			view.getAdapterTable().setModel(versionModel.getSecondaryTableModel());
+			VariationModel variationModel = (VariationModel) evt.getNewValue();
+			if (variationModel == null){
+				view.getVersionTable().setModel(new DefaultTableModel());
+				view.getAdapterTable().setModel(new DefaultTableModel());
+			} else {
+				view.getVersionTable().setModel(variationModel.getMainTableModel());
+				view.getAdapterTable().setModel(variationModel.getSecondaryTableModel());
+			}
 			return;
 		}
 	}

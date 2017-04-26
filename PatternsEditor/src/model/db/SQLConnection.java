@@ -16,50 +16,42 @@ public final class SQLConnection {
 	
 	public void initDatabase(){
 		Connection connection = null;
-		try {
-            System.out.println(url);
-            
+		try {            
             connection = DriverManager.getConnection(url);
-            System.out.println("Connection to SQLite has been established.");
             String dropTable = "DROP TABLE pattern";
     		String patternTable = "CREATE TABLE IF NOT EXISTS pattern (\n"
                     + "	name TEXT PRIMARY KEY,\n"
                     + " diagramId INTEGER,\n"
                     + " description TEXT,\n"
+                    + " xml TEXT,\n"
                     + " FOREIGN KEY(diagramId) REFERENCES diagram(id)"
-                    + ");";
-    		String diagramTable = "CREATE TABLE IF NOT EXISTS diagram (\n"
-                    + "	id INTEGER PRIMARY KEY,\n"
-    				+ " patternId INTEGER,\n"
-                    + " FOREIGN KEY(patternId) REFERENCES pattern(id)"
                     + ");";
     		String adapterTable = "CREATE TABLE IF NOT EXISTS adapter (\n"
     				+ " id INTEGER PRIMARY KEY,\n"
-    				+ " mainPatternId INTEGER,\n"
-    				+ " secondaryPatternId INTEGER,\n"
-    	            + " FOREIGN KEY(mainPatternId) REFERENCES pattern(id),\n"
-    	            + " FOREIGN KEY(secondaryPatternId) REFERENCES pattern(id)"
+    				+ " mainPattern TEXT,\n"
+    				+ " secondaryPattern TEXT,\n"
+    	            + " FOREIGN KEY(mainPattern) REFERENCES pattern(name),\n"
+    	            + " FOREIGN KEY(secondaryPattern) REFERENCES pattern(name)"
     	            + ");";
     		String versionTable = "CREATE TABLE IF NOT EXISTS version (\n"
     				+ " id INTEGER PRIMARY KEY,\n"
-    				+ " mainPatternId INTEGER,\n"
-    				+ " secondaryPatternId INTEGER,\n"
-    	            + " FOREIGN KEY(mainPatternId) REFERENCES pattern(id),\n"
-    	            + " FOREIGN KEY(secondaryPatternId) REFERENCES pattern(id)"
+    				+ " mainPattern TEXT,\n"
+    				+ " secondaryPattern TEXT,\n"
+    	            + " FOREIGN KEY(mainPattern) REFERENCES pattern(name),\n"
+    	            + " FOREIGN KEY(secondaryPattern) REFERENCES pattern(name)"
     	            + ");";
     		
     		Statement stmt;
     		try {
     			stmt = connection.createStatement();
-    			//stmt.execute(dropTable);
+    			//stmt.execute("DROP TABLE version");
+    			//stmt.execute("DROP TABLE adapter");
     			stmt.execute(patternTable);
-    			stmt.execute(diagramTable);
     			stmt.execute(adapterTable);
     			stmt.execute(versionTable);
     		} catch (SQLException e) {
     			System.out.println(e.getMessage());
     		}
-            System.out.println("Tables created.");
         } catch (SQLException e1) {
             System.out.println(e1.getMessage());
         } finally{

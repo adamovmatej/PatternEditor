@@ -5,10 +5,10 @@ import java.awt.event.ActionListener;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+
 import controller.MainScreenController;
 
 public class MainMenuBar extends JMenuBar{
@@ -31,7 +31,6 @@ public class MainMenuBar extends JMenuBar{
 	private JMenuItem newAdapter = new JMenuItem();
 	private JMenuItem patternOverView = new JMenuItem();
 	private JMenuItem save = new JMenuItem();
-	private JMenuItem saveAs = new JMenuItem();
 	private JMenuItem open = new JMenuItem();	
 		
 	public MainMenuBar() {
@@ -50,6 +49,7 @@ public class MainMenuBar extends JMenuBar{
 			}
 		});
 		
+		newVersion.setEnabled(false);
 		newVersion.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -57,6 +57,7 @@ public class MainMenuBar extends JMenuBar{
 			}
 		});
 		
+		newAdapter.setEnabled(false);
 		newAdapter.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -71,11 +72,12 @@ public class MainMenuBar extends JMenuBar{
 			}
 		});
 		
+		save.setEnabled(false);
 		save.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				controller.saveDiagram();
 			}
 		});
 		
@@ -83,7 +85,7 @@ public class MainMenuBar extends JMenuBar{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {				
-				
+				controller.createOpenDiagramDialog();
 			}
 		});
 		
@@ -96,7 +98,6 @@ public class MainMenuBar extends JMenuBar{
 		file.add(patternOverView);
 		file.addSeparator();
 		file.add(save);
-		file.add(saveAs);
 		file.add(open);
 		
 		add(file);
@@ -128,7 +129,12 @@ public class MainMenuBar extends JMenuBar{
 		newAdapter.setText(bundle.getString("menu.newAdapter"));
 		patternOverView.setText(bundle.getString("menu.patternOverView"));
 		save.setText(bundle.getString("menu.save"));
-		saveAs.setText(bundle.getString("menu.saveAs"));
 		open.setText(bundle.getString("menu.open"));
+	}
+
+	public void chceckDiagramItems(Boolean enabled) {
+		save.setEnabled(enabled);
+		newAdapter.setEnabled(enabled);
+		newVersion.setEnabled(enabled);
 	}
 }

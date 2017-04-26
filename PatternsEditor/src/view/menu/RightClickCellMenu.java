@@ -11,14 +11,11 @@ import controller.EditorController;
 public class RightClickCellMenu extends JPopupMenu {
 	
 	private static final long serialVersionUID = 1L;
-
-	private EditorController controller;
 	
 	private JMenuItem properties;
 	private JMenuItem delete;
 	
     public RightClickCellMenu(EditorController controller, MouseEvent me){
-    	this.controller = controller;
     	
     	properties  = new JMenuItem("Properties");
     	delete = new JMenuItem("Delete");

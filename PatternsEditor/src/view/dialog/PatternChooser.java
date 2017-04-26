@@ -28,8 +28,10 @@ public class PatternChooser extends JDialog {
 			setTitle(bundle.getString("title.addVersion"));
 		} else if (type.equals("diagram")){
 			setTitle(bundle.getString("title.newDiagram"));
-		} else {
+		} else if (type.equals("adapter")){
 			setTitle(bundle.getString("title.addAdapter"));
+		} else {
+			setTitle(bundle.getString("title.openDiagram"));
 		}
 		
 		setModal(true);
@@ -46,9 +48,11 @@ public class PatternChooser extends JDialog {
 						controller.createVersion((String) table.getModel().getValueAt(table.getSelectedRow(), 0));
 					} else if (type.equals("diagram")){
 						controller.createDiagram((String) table.getModel().getValueAt(table.getSelectedRow(), 0));
-					} else {
+					} else if (type.equals("adapter")){
 						controller.createAdapter((String) table.getModel().getValueAt(table.getSelectedRow(), 0));
-					}					
+					} else {		
+						controller.openDiagram((String) table.getModel().getValueAt(table.getSelectedRow(), 0));
+					}
 					PatternChooser.this.dispose();
 				} else {
 					JOptionPane.showMessageDialog(PatternChooser.this, bundle.getString("warning.patternNotSelected"));
@@ -82,8 +86,10 @@ public class PatternChooser extends JDialog {
 			lblHeader.setText(bundle.getString("label.verForPat")+":");
 		} else if (type.equals("diagram")){
 			lblHeader.setText(bundle.getString("label.diaForPat")+":");
-		} else {
+		} else if (type.equals("adapter")){
 			lblHeader.setText(bundle.getString("label.adaForPat")+":");
+		} else {
+			lblHeader.setText(bundle.getString("label.chosePattern")+":");
 		}
 		lblHeader.setBounds(12, 12, 207, 15);
 		getContentPane().add(lblHeader);

@@ -28,7 +28,7 @@ import view.dialog.EdgePropertiesDialog;
 import view.dialog.StatePropertiesDialog;
 import view.menu.RightClickMapMenu;
 import view.menu.RightClickCellMenu;
-
+//skuska
 public class EditorController implements PropertyChangeListener{
 	
 	private EditorView view;

@@ -42,8 +42,14 @@ public class VariationModel {
 		
 		String sqlVer = "SELECT secondaryPattern FROM version WHERE mainPattern = ?";
 		String sqlAda = "SELECT secondaryPattern FROM adapter WHERE mainPattern = ?";
-        try (PreparedStatement pstmtVer = connection.prepareStatement(sqlVer); PreparedStatement pstmtAda = connection.prepareStatement(sqlAda)) {
-        	connection.setAutoCommit(false);
+		Connection con = connection;				
+		if (connection == null){
+			con = SQLConnection.getInstance().getConnection();
+		} else {
+			con = connection;
+		}
+        try (PreparedStatement pstmtVer = con.prepareStatement(sqlVer); PreparedStatement pstmtAda = con.prepareStatement(sqlAda)) {
+        	con.setAutoCommit(false);
             pstmtVer.setString(1, pattern);
             ResultSet rs1 = pstmtVer.executeQuery();
             while (rs1.next()){
@@ -59,9 +65,11 @@ public class VariationModel {
             System.out.println(e.getMessage());
         } finally {
         	try {
-        		if (connection != null){
-        			connection.commit();
-        			connection.close();
+        		if (con != null){
+        			con.commit();
+        			if (connection == null){
+        				con.close();
+        			}
         		}
 			} catch (SQLException e) {
 				e.printStackTrace();

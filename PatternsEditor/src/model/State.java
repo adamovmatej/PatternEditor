@@ -14,6 +14,7 @@ public class State implements PropertyChangeListener, Serializable {
 	private Map<String, String> scenes;
 	private Map<String, String> names;
 	private Map<String, String> disabled;
+	private Map<String, String> io;
 
 	public State(){
 		currentVariation = "Default";
@@ -135,6 +136,14 @@ public class State implements PropertyChangeListener, Serializable {
 
 	public void setDisabled(Map<String, String> disabled) {
 		this.disabled = disabled;
+	}
+
+	public Map<String, String> getIo() {
+		return io;
+	}
+
+	public void setIo(Map<String, String> io) {
+		this.io = io;
 	}
 }
 

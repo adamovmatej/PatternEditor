@@ -78,7 +78,7 @@ public class DiagramModel {
 		this.diagrams = diagrams;
 	}
 	
-	private VariationModel getVariationModel(String name){
+	public VariationModel getVariationModel(String name){
 		return variationModels.get(name);
 	}
 
@@ -165,5 +165,10 @@ public class DiagramModel {
 				e.printStackTrace();
 			}
         }
+	}
+
+	public void removeVersion(String pattern, int selection) {		
+		VariationModel varModel = getVariationModel(pattern);
+		varModel.getMainTableModel().removeRow(selection);
 	}
 }

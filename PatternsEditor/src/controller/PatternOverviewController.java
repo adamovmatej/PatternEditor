@@ -6,8 +6,9 @@ import java.beans.PropertyChangeListener;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
-import model.Diagram;
+import model.DiagramModel;
 import model.Pattern;
 import model.PatternModel;
 import model.VariationModel;
@@ -17,11 +18,13 @@ public class PatternOverviewController implements PropertyChangeListener{
 	
 	private PatternsOverView overview = null;
 	private PatternModel patternModel;
+	private DiagramModel diagramModel;
 	
 	private String currentPattern;
 	
-	public PatternOverviewController(PatternModel patternModel) {
+	public PatternOverviewController(PatternModel patternModel, DiagramModel diagramModel) {
 		this.patternModel = patternModel;
+		this.diagramModel = diagramModel;
 		
 		patternModel.addListener(this);
 	}
@@ -38,6 +41,15 @@ public class PatternOverviewController implements PropertyChangeListener{
 		}		
 	}
 	
+	private void populateVariationTables(String pattern) {
+		VariationModel variationModel = diagramModel.getVariationModel(pattern);
+		if (variationModel == null){
+			variationModel = new VariationModel(pattern, null);			
+		}		
+		overview.getVersionTable().setModel(variationModel.getMainTableModel());
+		overview.getAdapterTable().setModel(variationModel.getSecondaryTableModel());
+	}
+
 	private void populateTable(){
 		overview.getTable().setModel(patternModel.generateTableModel());
 	}
@@ -61,6 +73,7 @@ public class PatternOverviewController implements PropertyChangeListener{
 	
 	private void initPatternInformation(String name){
 		Pattern pattern = patternModel.dbGetPattern(name);
+		populateVariationTables(name);
 		overview.showOverview(pattern.getName(), pattern.getDescription());
 	}
 
@@ -87,5 +100,16 @@ public class PatternOverviewController implements PropertyChangeListener{
 				return;
 			}
 		}
+	}
+	
+	public void removeVersion(){
+		//TODO
+		int selection = overview.getVersionTable().getSelectedRow();
+		//diagramModel.removeVersion((String) overview.getTable().getModel().getValueAt(overview.getTable().getSelectedRow(), 0), selection);
+	}
+	
+	public void removeAdapter(){
+		//TODO
+		((DefaultTableModel)overview.getAdapterTable().getModel()).removeRow(overview.getAdapterTable().getSelectedRow());
 	}
 }

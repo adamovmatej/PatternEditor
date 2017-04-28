@@ -36,7 +36,7 @@ public class Main {
 		
 		EditorController editorController = new EditorController(editorView, diagramModel);
 		VersionPanelController versionPanelController = new VersionPanelController(versionPanelView, diagramModel);
-		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel);
+		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel, diagramModel);
 		MainScreenController mainScreenController = new MainScreenController(mainScreen, mainMenuBar, diagramModel, patternModel, patternOverviewController);
 		
 		versionPanelView.setController(versionPanelController);

@@ -10,8 +10,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.plaf.SplitPaneUI;
-
 import controller.PatternOverviewController;
 
 import javax.swing.JTabbedPane;
@@ -34,7 +32,7 @@ public class PatternsOverView extends JFrame {
 	private JTable adapterTable;
 	
 	public PatternsOverView() {
-		
+		setAlwaysOnTop(true);
 		setBounds(200, 200, 750, 500);
 		
 		splitPane = new JSplitPane();
@@ -119,10 +117,10 @@ public class PatternsOverView extends JFrame {
 		
 		JButton btnRemoveVersions = new JButton("Remove");
 		btnRemoveVersions.setBounds(96, 434, 117, 25);
-		btnRemoveVersions.addActionListener(new ActionListener() {			
+		btnRemoveVersions.addActionListener(new ActionListener() {		
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				controller.removeVersion();
 			}
 		});
 		versions.add(btnRemoveVersions);
@@ -191,5 +189,21 @@ public class PatternsOverView extends JFrame {
 
 	public void setController(PatternOverviewController controller) {
 		this.controller = controller;
+	}
+
+	public JTable getVersionTable() {
+		return versionTable;
+	}
+
+	public void setVersionTable(JTable versionTable) {
+		this.versionTable = versionTable;
+	}
+
+	public JTable getAdapterTable() {
+		return adapterTable;
+	}
+
+	public void setAdapterTable(JTable adapterTable) {
+		this.adapterTable = adapterTable;
 	}
 }

@@ -141,10 +141,13 @@ public class EditorController implements PropertyChangeListener{
 	}
 	
 	private void paintCell(mxCell cell, String version){
-		if (((State)cell.getValue()).getDisable(version)){
-			cell.setStyle("defaultVertex;fillColor=gray");
-		} else {
-			cell.setStyle("defaultVertex");
+		Object value = cell.getValue();
+		if (value.getClass().equals(State.class)){
+			if (((State)cell.getValue()).getDisable(version)){
+				cell.setStyle("defaultVertex;fillColor=gray");
+			} else {
+				cell.setStyle("defaultVertex");
+			}			
 		}
 	}
 	
@@ -215,6 +218,38 @@ public class EditorController implements PropertyChangeListener{
 			graph.getModel().endUpdate();
 		}
 		
+		graph.refresh();
+		graph.repaint();
+	}
+
+	public void createStart(MouseEvent me) {
+		Diagram diagram = (Diagram)view.getMap().getSelectedComponent();
+		mxGraph graph = diagram.getGraph();
+		
+		graph.getModel().beginUpdate();
+		try{
+			mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "Start", me.getX(), me.getY(), 35, 35);
+			cell.setStyle("CIRCLE;fillColor=black");
+		} finally{
+			graph.getModel().endUpdate();
+		}			
+
+		graph.refresh();
+		graph.repaint();
+	}
+
+	public void createEnd(MouseEvent me) {
+		Diagram diagram = (Diagram)view.getMap().getSelectedComponent();
+		mxGraph graph = diagram.getGraph();
+		
+		graph.getModel().beginUpdate();
+		try{
+			mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "End", me.getX(), me.getY(), 35, 35);
+			cell.setStyle("CIRCLE;fillColor=black");
+		} finally{
+			graph.getModel().endUpdate();
+		}			
+
 		graph.refresh();
 		graph.repaint();
 	}	

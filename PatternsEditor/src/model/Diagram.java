@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import org.w3c.dom.Document;
@@ -14,8 +15,10 @@ import org.w3c.dom.Document;
 import com.mxgraph.io.mxCodec;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxRubberband;
+import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxXmlUtils;
 import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxStylesheet;
 
 import model.db.SQLConnection;
 
@@ -40,12 +43,22 @@ public class Diagram extends mxGraphComponent{
 		this.versions = new HashMap<>();
 		this.adapters = new HashMap<>();
 		
+		initStyleSheet();
+		
 		if (model == null){
 			addVersion(new Version(pattern, "Default"));			
 		} else {
 			initVariations(model);
 		}
   	}
+
+	private void initStyleSheet() {
+		mxStylesheet stylesheet = graph.getStylesheet();
+		Hashtable<String, Object> style = new Hashtable<String, Object>();
+		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
+		style.put(mxConstants.STYLE_FONTCOLOR, "white");
+		stylesheet.putCellStyle("CIRCLE", style);
+	}
 
 	public void changeVersion(String name) {
 		setCurrentVariation(getVersion(name));

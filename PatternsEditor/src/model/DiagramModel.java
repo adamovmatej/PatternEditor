@@ -1,116 +1,38 @@
 package model;
 
 import java.beans.PropertyChangeListener;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.event.SwingPropertyChangeSupport;
 
-import com.mxgraph.view.mxGraph;
-
-import model.db.SQLConnection;
-
 public class DiagramModel {
 	
-	private SwingPropertyChangeSupport propertyChangeSupport;
+	private SwingPropertyChangeSupport propertyChangeSupport;	
+	private Map<String, Adapter> adapters;	
+	private Adapter currentAdapter;
+	private String pattern;
 	
-	private Map<String, Diagram> diagrams;
-	private Map<String, VariationModel> variationModels;
-	private Diagram currentDiagram;
-	
-	public DiagramModel() {
+	public DiagramModel(String pattern) {
+		this.setPattern(pattern);
 		propertyChangeSupport = new SwingPropertyChangeSupport(this);
-		diagrams = new HashMap<String, Diagram>();
-		variationModels = new HashMap<String, VariationModel>();
+		List<String> list = new ArrayList<>();
+		list.add("Default");
+		currentAdapter = new Adapter(pattern, list);
+		adapters = new HashMap<String, Adapter>();
+		adapters.put(currentAdapter.getLineName(), currentAdapter);
 	}
 	
-	public void createDiagram(String name){
-		currentDiagram = new Diagram(new mxGraph(), name, null);
-		diagrams.put(name, currentDiagram);
-		VariationModel variationModel = new VariationModel(currentDiagram);
-		variationModels.put(name, variationModel);
-		propertyChangeSupport.firePropertyChange("newDiagram", variationModel, currentDiagram);
-	}
-	
-	public void createVersion(String name) {
-		Version version = new Version(currentDiagram.getPattern(), name);
-		currentDiagram.addVersion(version);
-		VariationModel variationModel = getVariationModel(version.getMainPattern());
-		variationModel.addVariation(version);
-		propertyChangeSupport.firePropertyChange("newVariation", null, version);
-	}
-	
-	public void createAdapter(String name) {
-		Adapter adapter = new Adapter(currentDiagram.getPattern(), name);
-		currentDiagram.addAdapter(adapter);
-		VariationModel variationModel = getVariationModel(adapter.getMainPattern());
-		variationModel.addVariation(adapter);
-		propertyChangeSupport.firePropertyChange("newVariation", null, adapter);
-	}
-	
-	public void changeVersion(String name){
-		currentDiagram.changeVersion(name);		
-		propertyChangeSupport.firePropertyChange("variationChange", null, currentDiagram.getCurrentVariation());
-	}
-	
-	public void changeAdapter(String name){
-		currentDiagram.changeAdapter(name);		
-		propertyChangeSupport.firePropertyChange("variationChange", null, currentDiagram.getCurrentVariation());
-	}
-	
-	public void addListener(PropertyChangeListener prop) {
-		propertyChangeSupport.addPropertyChangeListener(prop);
-    }
-	
-	public Diagram getDiagram(String pattern){
-		return diagrams.get(pattern);
-	}
-
-	public Map<String, Diagram> getDiagrams() {
-		return diagrams;
-	}
-
-	public void setDiagrams(Map<String, Diagram> diagrams) {
-		this.diagrams = diagrams;
-	}
-	
-	public VariationModel getVariationModel(String name){
-		return variationModels.get(name);
-	}
-
-	public Map<String, VariationModel> getVersionModels() {
-		return variationModels;
-	}
-
-	public void setVersionModels(Map<String, VariationModel> versionModels) {
-		this.variationModels = versionModels;
-	}
-
-	public Diagram getCurrentDiagram() {
-		return currentDiagram;
-	}
-
-	public void setCurrentDiagram(Diagram currentDiagram) {
-		if (currentDiagram == this.currentDiagram){
-			return;
-		}
-		this.currentDiagram = currentDiagram;
-		VariationModel model = null;
-		if (currentDiagram != null){
-			model = variationModels.get(currentDiagram.getPattern());
-		}
-		propertyChangeSupport.firePropertyChange("changeDiagram", currentDiagram, model);
-	}
-
-	public void closeDiagram(Diagram diagram) {
-		diagrams.remove(diagram.getPattern());
+	public void createAdapter(List<String> patterns){
+		currentAdapter = new Adapter(pattern, patterns);
+		adapters.put(currentAdapter.getLineName(), currentAdapter);
+		propertyChangeSupport.firePropertyChange("newAdapter", null, currentAdapter);
 	}
 	
 	public void save() {
+		/*
 		Connection connection = SQLConnection.getInstance().getConnection();
 		String sql = "UPDATE pattern SET xml = ? "
                 + "WHERE name = ?";	
@@ -125,11 +47,12 @@ public class DiagramModel {
 			try {
 				if (connection != null){
 					connection.close();
-				}
+				}firePropertyChange
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
+		*/
 		//TODO
 		//propertyChangeSupport.firePropertyChange("patternUpdate", name, new Pattern(newName, description));
 	}
@@ -139,6 +62,7 @@ public class DiagramModel {
 	}
 	
 	public void open(String pattern){
+		/*
 		String sql = "SELECT xml FROM pattern WHERE name = ?";
 		Connection connection = SQLConnection.getInstance().getConnection();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -165,10 +89,49 @@ public class DiagramModel {
 				e.printStackTrace();
 			}
         }
+        */
 	}
 
-	public void removeVersion(String pattern, int selection) {		
-		VariationModel varModel = getVariationModel(pattern);
-		varModel.getMainTableModel().removeRow(selection);
+	public void addListener(PropertyChangeListener prop){
+		propertyChangeSupport.addPropertyChangeListener(prop);
+	}
+	
+	public void removeVersion(String pattern, int selection) {	
+		//TODO
+		//VariationModel varModel = getVariationModel(pattern);
+	}
+
+	public String getPattern() {
+		return pattern;
+	}
+
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
+	}
+
+	public Adapter getCurrentAdapter() {
+		return currentAdapter;
+	}	
+
+	public Adapter getAdapter(String key) {
+		return adapters.get(key);
+	}
+
+	public void setCurrentAdapter(Adapter currentAdapter) {
+		this.currentAdapter = currentAdapter;
+	}
+
+	public Map<String, Adapter> getAdapters() {
+		return adapters;
+	}
+
+	public void setAdapters(Map<String, Adapter> adapters) {
+		this.adapters = adapters;
+	}
+
+	public void changeAdapter(String adapter) {
+		System.out.println("Change : "+adapter);
+		currentAdapter = adapters.get(adapter);
+		propertyChangeSupport.firePropertyChange("adapterChange", null, currentAdapter.getDiagram());
 	}
 }

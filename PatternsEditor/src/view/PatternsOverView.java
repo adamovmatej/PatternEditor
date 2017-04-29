@@ -28,7 +28,6 @@ public class PatternsOverView extends JFrame {
 	private JSplitPane splitPane;	
 	private JTextField textName;
 	private JTextArea textDescription;
-	private JTable versionTable;
 	private JTable adapterTable;
 	
 	public PatternsOverView() {
@@ -103,48 +102,7 @@ public class PatternsOverView extends JFrame {
 			}
 		});
 		overview.add(btnCancel);
-		
-		JPanel versions = new JPanel();
-		tabbedPane.addTab("Versions", null, versions, null);
-		versions.setLayout(null);
-		
-		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(12, 31, 459, 391);
-		versions.add(scrollPane_1);
-		
-		versionTable = new JTable();
-		scrollPane_1.setViewportView(versionTable);
-		
-		JButton btnRemoveVersions = new JButton("Remove");
-		btnRemoveVersions.setBounds(96, 434, 117, 25);
-		btnRemoveVersions.addActionListener(new ActionListener() {		
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.removeVersion();
-			}
-		});
-		versions.add(btnRemoveVersions);
-		
-		JButton btnNewVersions = new JButton("New");
-		btnNewVersions.setBounds(225, 434, 117, 25);
-		btnNewVersions.addActionListener(new ActionListener() {			
-			@Override
-			public void actionPerformed(ActionEvent e) {
 				
-			}
-		});
-		versions.add(btnNewVersions);
-		
-		JButton btnPlayVersions = new JButton("Play");
-		btnPlayVersions.setBounds(354, 434, 117, 25);
-		btnPlayVersions.addActionListener(new ActionListener() {			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		versions.add(btnPlayVersions);
-		
 		JPanel adapters = new JPanel();
 		adapters.setLayout(null);
 		tabbedPane.addTab("Adapters", null, adapters, null);
@@ -189,14 +147,6 @@ public class PatternsOverView extends JFrame {
 
 	public void setController(PatternOverviewController controller) {
 		this.controller = controller;
-	}
-
-	public JTable getVersionTable() {
-		return versionTable;
-	}
-
-	public void setVersionTable(JTable versionTable) {
-		this.versionTable = versionTable;
 	}
 
 	public JTable getAdapterTable() {

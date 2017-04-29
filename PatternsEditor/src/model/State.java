@@ -6,144 +6,70 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class State implements PropertyChangeListener, Serializable {
+public class State implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private String currentVariation;
-	private Map<String, String> scenes;
-	private Map<String, String> names;
-	private Map<String, String> disabled;
-	private Map<String, String> io;
+	private int id;
+	private String scene;
+	private String name;
+	private Boolean disabled;
 
 	public State(){
-		currentVariation = "Default";
-		scenes = new HashMap<String, String>();
-		names = new HashMap<String, String>();
-		disabled = new HashMap<String, String>();
 	}
 	
-	public State(String name, String scene, Boolean disable, String version) {
-		currentVariation = version;
-		scenes = new HashMap<String, String>();
-		names = new HashMap<String, String>();
-		disabled = new HashMap<String, String>();
-		
-		scenes.put(version, scene);
-		names.put(version, name);
-		disabled.put(version, disable.toString());
+	public State(String name, String scene, Boolean disable) {
+		this.setName(name);
+		this.setScene(scene);
+		this.setDisabled(disable);
 	}
 	
-	public void update(String name, String scene, String version, Boolean disable){
-		if (scenes.containsKey(version)){
-			scenes.replace(version, scene);			
-		} else {
-			scenes.put(version, scene);
-		}
-		if (names.containsKey(version)){
-			names.replace(version, name);			
-		} else {
-			names.put(version, name);
-		}
-		if (disabled.containsKey(version)){
-			disabled.replace(version, disable.toString());
-		} else {
-			disabled.put(version, disable.toString());
-		}
-	}
-	
-	public void update(String name, String scene, String version){
-		if (scenes.containsKey(version)){
-			scenes.replace(version, scene);			
-		} else {
-			scenes.put(version, scene);
-		}
-		if (names.containsKey(version)){
-			names.replace(version, name);			
-		} else {
-			names.put(version, name);
-		}
-	}
-	
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("variationChange") || evt.getPropertyName().equals("newVariation")){
-			currentVariation = ((Variation) evt.getNewValue()).getSecondaryPattern();
-		}
+	public void update(String name, String scene, Boolean disable){
+		this.setName(name);
+		this.setScene(scene);
+		this.setDisabled(disable);
 	}	
 	
-	public String getScene(String version){
-		String result = scenes.get(version);
-		if (!(result==null)){
-			return result;
-		} else {
-			String def = scenes.get("Default");
-			if (!(def==null)){
-				return def;
-			} else {
-				return "Default - empty";
-			}
-		}
-	}
-	
-	public String getName(String version){
-		String result = names.get(version);
-		if (!(result==null)){
-			return result;
-		} else {
-			String def = names.get("Default");
-			if (!(def==null)){
-				return def;
-			} else {
-				return "Default - empty";
-			}
-		}
-	}
-	
-	public Boolean getDisable(String version){
-		String result = disabled.get(version);
-		if (result!=null){
-			return Boolean.valueOf(result);
-		} else {
-			return false;
-		}
-	}
+	public void update(String name, String scene){
+		this.setName(name);
+		this.setScene(scene);
+	}	
 	
 	@Override
 	public String toString() {
-		return getName(currentVariation);
+		return name;
 	}
 
-	public Map<String, String> getScenes() {
-		return scenes;
+	public int getId() {
+		return id;
 	}
 
-	public void setScenes(Map<String, String> scenes) {
-		this.scenes = scenes;
+	public void setId(int id) {
+		this.id = id;
 	}
 
-	public Map<String, String> getNames() {
-		return names;
+	public String getScene() {
+		return scene;
 	}
 
-	public void setNames(Map<String, String> names) {
-		this.names = names;
+	public void setScene(String scene) {
+		this.scene = scene;
 	}
 
-	public Map<String, String> getDisabled() {
+	public Boolean getDisabled() {
 		return disabled;
 	}
 
-	public void setDisabled(Map<String, String> disabled) {
+	public void setDisabled(Boolean disabled) {
 		this.disabled = disabled;
 	}
 
-	public Map<String, String> getIo() {
-		return io;
+	public String getName() {
+		return name;
 	}
 
-	public void setIo(Map<String, String> io) {
-		this.io = io;
+	public void setName(String name) {
+		this.name = name;
 	}
 }
 

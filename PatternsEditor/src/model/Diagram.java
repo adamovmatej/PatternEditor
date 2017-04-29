@@ -27,29 +27,17 @@ public class Diagram extends mxGraphComponent{
 	private static final long serialVersionUID = 1L;
 	
 	private String pattern;
-	private Variation currentVariation;
-	private Map<String, Version> versions;
-	private Map<String, Adapter> adapters;
   	private mxRubberband rubberband;
 	  	
-  	public Diagram(mxGraph graph, String pattern, VariationModel model) {
+  	public Diagram(mxGraph graph, String pattern) {
 		super(graph);
 		this.getGraph().setAllowDanglingEdges(false);
 		this.getGraph().setCellsEditable(false);
 		this.rubberband = new mxRubberband(this);
 		this.graph.setCellsDeletable(true);
-
-		this.pattern = pattern;
-		this.versions = new HashMap<>();
-		this.adapters = new HashMap<>();
-		
 		initStyleSheet();
 		
-		if (model == null){
-			addVersion(new Version(pattern, "Default"));			
-		} else {
-			initVariations(model);
-		}
+		this.pattern = pattern;
   	}
 
 	private void initStyleSheet() {
@@ -58,31 +46,6 @@ public class Diagram extends mxGraphComponent{
 		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
 		style.put(mxConstants.STYLE_FONTCOLOR, "white");
 		stylesheet.putCellStyle("CIRCLE", style);
-	}
-
-	public void changeVersion(String name) {
-		setCurrentVariation(getVersion(name));
-		System.out.println(currentVariation.getSecondaryPattern());
-		graph.refresh();
-		graph.repaint();
-	}
-	
-	public void changeAdapter(String name) {
-		setCurrentVariation(getAdapter(name));
-		graph.refresh();
-		graph.repaint();
-	}
-
-	public void addVersion(Version version) {
-		setCurrentVariation(version);
-		versions.put(version.getSecondaryPattern(), version);
-		dbSaveVersion(version);
-	}
-	
-	public void addAdapter(Adapter adapter) {
-		setCurrentVariation(adapter);
-		adapters.put(adapter.getSecondaryPattern(), adapter);
-		dbSaveAdapter(adapter);
 	}
 	
 	public String getXml(){
@@ -107,42 +70,8 @@ public class Diagram extends mxGraphComponent{
 		}
 	}
 	
-	private void initVariations(VariationModel model){
-		String variation;
-		for (int i = 0; i < model.getMainTableModel().getRowCount(); i++){
-			variation = (String) model.getMainTableModel().getValueAt(i, 0);
-			versions.put(variation, new Version(pattern, variation));
-		}
-		for (int i = 0; i < model.getSecondaryTableModel().getRowCount(); i++){
-			variation = (String) model.getSecondaryTableModel().getValueAt(i, 0);
-			adapters.put(variation, new Adapter(pattern, variation));
-		}
-		currentVariation = versions.get("Default");
-		System.out.println(currentVariation.getSecondaryPattern());
-	}
-	
-	private void dbSaveVersion(Version version){
-		String sql = "INSERT INTO version(mainPattern,secondaryPattern) VALUES(?,?)";
-		Connection connection = SQLConnection.getInstance().getConnection();
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, version.getMainPattern());
-            pstmt.setString(2, version.getSecondaryPattern());
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-        	System.out.println(sql);
-            System.out.println(e.getMessage());
-        } finally {
-        	try {
-        		if (connection != null){
-        			connection.close();
-        		}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-        }
-	}
-	
 	private void dbSaveAdapter(Adapter adapter){
+		/*
 		String sql = "INSERT INTO adapter(mainPattern,secondaryPattern) VALUES(?,?)";
 		Connection connection = SQLConnection.getInstance().getConnection();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -161,7 +90,8 @@ public class Diagram extends mxGraphComponent{
 				e.printStackTrace();
 			}
         }
-	}	
+        */
+	}
 
 	public String getPattern() {
 		return pattern;
@@ -169,38 +99,5 @@ public class Diagram extends mxGraphComponent{
 
 	public void setPattern(String pattern) {
 		this.pattern = pattern;
-	}
-	
-	private Version getVersion(String key){
-		return versions.get(key);
-	}
-
-	private Variation getAdapter(String key) {
-		return adapters.get(key);
-	}
-
-	public Variation getCurrentVariation() {
-		return currentVariation;
-	}
-
-	public void setCurrentVariation(Variation currentVariation) {
-		this.currentVariation = currentVariation;
-	}
-
-	public Map<String, Version> getVersions() {
-		return versions;
-	}
-
-	public void setVersions(Map<String, Version> versions) {
-		this.versions = versions;
-	}
-
-	public Map<String, Adapter> getAdapters() {
-		return adapters;
-	}
-
-	public void setAdapters(Map<String, Adapter> adapters) {
-		this.adapters = adapters;
-	}
-
+	}	
 }

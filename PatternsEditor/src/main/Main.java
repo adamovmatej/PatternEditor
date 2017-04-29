@@ -9,6 +9,7 @@ import controller.PatternOverviewController;
 import controller.VersionPanelController;
 import model.DiagramModel;
 import model.Edge;
+import model.EditorModel;
 import model.PatternModel;
 import model.State;
 import model.db.SQLConnection;
@@ -32,12 +33,12 @@ public class Main {
 		MainScreen mainScreen = new MainScreen(mainMenuBar, editorView);
 		
 		PatternModel patternModel = new PatternModel();
-		DiagramModel diagramModel = new DiagramModel();
+		EditorModel editorModel = new EditorModel();
 		
-		EditorController editorController = new EditorController(editorView, diagramModel);
-		VersionPanelController versionPanelController = new VersionPanelController(versionPanelView, diagramModel);
-		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel, diagramModel);
-		MainScreenController mainScreenController = new MainScreenController(mainScreen, mainMenuBar, diagramModel, patternModel, patternOverviewController);
+		EditorController editorController = new EditorController(editorView, editorModel);
+		VersionPanelController versionPanelController = new VersionPanelController(versionPanelView, editorModel);
+		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel, editorModel);
+		MainScreenController mainScreenController = new MainScreenController(mainScreen, mainMenuBar, editorModel, patternModel, patternOverviewController);
 		
 		versionPanelView.setController(versionPanelController);
 		editorView.setController(editorController);

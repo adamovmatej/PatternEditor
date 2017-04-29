@@ -11,91 +11,69 @@ import javax.swing.text.TableView.TableRow;
 
 import model.Diagram;
 import model.DiagramModel;
+import model.EditorModel;
 import model.Variation;
 import model.Version;
-import model.VariationModel;
+import model.Adapter;
+import model.AdapterModel;
 import view.VersionPanelView;
 
 public class VersionPanelController implements PropertyChangeListener{
 	
 	private VersionPanelView view;
-	private DiagramModel model;
+	private EditorModel model;
 	
-	public VersionPanelController(VersionPanelView view, DiagramModel model) {
+	public VersionPanelController(VersionPanelView view, EditorModel editorModel) {
 		this.view = view;
-		this.model = model;
+		this.model = editorModel;
 		
 		initTables();
 		
-		model.addListener(this);
+		editorModel.addListener(this);
 	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("newDiagram")){
-			Diagram diagram = (Diagram) evt.getNewValue();
-			VariationModel versionModel = (VariationModel) evt.getOldValue();
-			view.getVersionTable().setModel(versionModel.getMainTableModel());
-			view.getAdapterTable().setModel(versionModel.getSecondaryTableModel());
-			selectTableRow(diagram.getCurrentVariation());
+		if (evt.getPropertyName().equals("newDiagramModel")){
+			DiagramModel diagramModel = (DiagramModel) evt.getNewValue();
+			AdapterModel versionModel = (AdapterModel) evt.getOldValue();
+			view.getAdapterTable().setModel(versionModel.getAdapterTableModel());
+			selectTableRow(diagramModel.getCurrentAdapter().getLineName());
 			return;
 		}
-		if (evt.getPropertyName().equals("newVariation")){
-			Variation variation = (Variation) evt.getNewValue();
-			selectTableRow(variation);
+		if (evt.getPropertyName().equals("newAdapter")){
+			String name = ((Adapter) evt.getNewValue()).getLineName();
+			selectTableRow(name);
 			return;
 		}
 		if (evt.getPropertyName().equals("changeDiagram")){
-			VariationModel variationModel = (VariationModel) evt.getNewValue();
+			AdapterModel variationModel = (AdapterModel) evt.getNewValue();
 			if (variationModel == null){
-				view.getVersionTable().setModel(new DefaultTableModel());
 				view.getAdapterTable().setModel(new DefaultTableModel());
 			} else {
-				view.getVersionTable().setModel(variationModel.getMainTableModel());
-				view.getAdapterTable().setModel(variationModel.getSecondaryTableModel());
+				view.getAdapterTable().setModel(variationModel.getAdapterTableModel());
 			}
 			return;
 		}
 	}
 	
-	private void selectTableRow(Variation variation){
-		if (variation.getClass().equals(Version.class)){
-			for (int i=0; i<view.getVersionTable().getRowCount(); i++){
-				if (variation.getSecondaryPattern().equals(view.getVersionTable().getValueAt(i, 0))){
-					view.getVersionTable().setRowSelectionInterval(i, i);
-					return;
-				}
-			}
-		} else {
-			for (int i=0; i<view.getAdapterTable().getRowCount(); i++){
-				if (variation.getSecondaryPattern().equals(view.getAdapterTable().getValueAt(i, 0))){
-					view.getAdapterTable().setRowSelectionInterval(i, i);
-					return;
-				}
+	private void selectTableRow(String name){		
+		for (int i=0; i<view.getAdapterTable().getRowCount(); i++){
+			if (name.equals(view.getAdapterTable().getValueAt(i, 0))){
+				view.getAdapterTable().setRowSelectionInterval(i, i);
+				return;
 			}
 		}
 	}
 	
 	private void initTables(){
-		view.getVersionTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		view.getAdapterTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		
-		view.getVersionTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {			
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (view.getVersionTable().getSelectedRow()!=-1){
-					view.getAdapterTable().clearSelection();
-					model.changeVersion((String) view.getVersionTable().getModel().getValueAt(view.getVersionTable().getSelectedRow(), 0));					
-				}
-			}
-		});
 		
 		view.getAdapterTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (view.getAdapterTable().getSelectedRow()!=-1){
-					view.getVersionTable().clearSelection();
-					model.changeAdapter((String) view.getAdapterTable().getModel().getValueAt(view.getAdapterTable().getSelectedRow(), 0));
+					model.getCurrentDiagramModel().changeAdapter((String) view.getAdapterTable().getModel().getValueAt(view.getAdapterTable().getSelectedRow(), 0));
 				}	
 			}
 		});

@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
@@ -17,9 +18,11 @@ import com.mxgraph.view.mxGraph;
 import controller.listener.ClickMapListener;
 import controller.listener.KeyMapListener;
 import controller.listener.MouseWheelListener;
+import model.Adapter;
 import model.Diagram;
 import model.DiagramModel;
 import model.Edge;
+import model.EditorModel;
 import model.State;
 import view.CustomTabPane;
 import view.EditorView;
@@ -28,69 +31,70 @@ import view.dialog.EdgePropertiesDialog;
 import view.dialog.StatePropertiesDialog;
 import view.menu.RightClickMapMenu;
 import view.menu.RightClickCellMenu;
-//skuska
+
 public class EditorController implements PropertyChangeListener{
 	
 	private EditorView view;
-	private DiagramModel model;
+	private EditorModel model;
 
-	public EditorController(EditorView view, DiagramModel model) {
+	public EditorController(EditorView view, EditorModel editorModel) {
 		this.view = view;
-		this.model = model;
+		this.model = editorModel;
 		((CustomTabPane)view.getRightComponent()).addChangeListener(new ChangeListener() {			
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				if (((CustomTabPane)view.getRightComponent()).getTabCount()>0){
-					model.setCurrentDiagram((Diagram) view.getMap().getComponentAt(view.getMap().getSelectedIndex()));					
+					editorModel.changeDiagramModel(((Diagram) view.getMap().getComponentAt(view.getMap().getSelectedIndex())).getPattern());					
 				} else {
-					model.setCurrentDiagram(null);
+					editorModel.changeDiagramModel(null);
 				}
 			}
 		});
-		model.addListener(this);
+		editorModel.addListener(this);
 	}
 	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("newDiagram")){
-			Diagram diagram = (Diagram)evt.getNewValue();
+		if (evt.getPropertyName().equals("newDiagramModel")){
+			DiagramModel diagramModel = (DiagramModel)evt.getNewValue();
+			diagramModel.addListener(this);
+			Diagram diagram = diagramModel.getCurrentAdapter().getDiagram();
 			initListeners(diagram);
 			insertDiagram(diagram);
 			return;
 		}
-		if (evt.getPropertyName().equals("newVariation")){
-			repaintCells(model.getCurrentDiagram());
-			view.getRightComponent().repaint();
+		if (evt.getPropertyName().equals("newAdapter")){
+			Diagram diagram = ((Adapter) evt.getNewValue()).getDiagram();
+			view.getMap().setComponentAt(view.getMap().getSelectedIndex(), diagram);
 			return;
 		}
-		if (evt.getPropertyName().equals("variationChange")){
-			repaintCells(model.getCurrentDiagram());
-			view.getRightComponent().repaint();
+		if (evt.getPropertyName().equals("adapterChange")){
+			Diagram diagram = (Diagram) evt.getNewValue();
+			view.getMap().setComponentAt(view.getMap().getSelectedIndex(), diagram);
 			return;
 		}
 	}
 	
 	public void removeTab(Component tab){
+		//TODO
 		Diagram diagram = (Diagram) tab;
-		model.closeDiagram(diagram);
+		//model.closeDiagram(diagram);
 	}
 	
 	public void createPropertiesDialog(MouseEvent me){
-		Diagram diagram = model.getCurrentDiagram();
+		Diagram diagram = model.getCurrentDiagramModel().getCurrentAdapter().getDiagram();
 		mxCell cell = (mxCell)(diagram.getCellAt(me.getX(), me.getY()));
 		if (cell.isEdge()){
 			Object obj = cell.getValue();
 			if (obj.getClass() == String.class){
-				cell.setValue(new Edge(diagram.getCurrentVariation().getSecondaryPattern()));
+				cell.setValue(new Edge());
 			}
 			Edge edge = (Edge) cell.getValue();
-			String version = diagram.getCurrentVariation().getSecondaryPattern();
-			EdgePropertiesDialog dialog = new EdgePropertiesDialog(this, edge.getName(version), edge.getScene(version), me);
+			EdgePropertiesDialog dialog = new EdgePropertiesDialog(this, edge.getName(), edge.getScene(), me);
 			dialog.setVisible(true);
 		} else{
 			State state = (State) cell.getValue();
-			String version = diagram.getCurrentVariation().getSecondaryPattern();
-			StatePropertiesDialog dialog = new StatePropertiesDialog(this, state.getName(version), state.getScene(version),state.getDisable(version), false, me);
+			StatePropertiesDialog dialog = new StatePropertiesDialog(this, state.getName(), state.getScene(),state.getDisabled(), false, me);
 			dialog.setVisible(true);
 		}
 		
@@ -104,13 +108,11 @@ public class EditorController implements PropertyChangeListener{
 	public void createState(String name, String scene, Boolean disable, MouseEvent me) {
 		Diagram diagram = (Diagram)view.getMap().getSelectedComponent();
 		mxGraph graph = diagram.getGraph();
-		State state = new State(name, scene, disable, diagram.getCurrentVariation().getSecondaryPattern());
-		model.addListener(state);
+		State state = new State(name, scene, disable);
 		
 		graph.getModel().beginUpdate();
 		try{
 			mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, state, me.getX(), me.getY(), 100, 50);
-			paintCell(cell, diagram.getCurrentVariation().getSecondaryPattern());
 		} finally{
 			graph.getModel().endUpdate();
 		}			
@@ -130,8 +132,7 @@ public class EditorController implements PropertyChangeListener{
 			if (state == null){
 				state = new State();
 			}
-			state.update(name, scene, diagram.getCurrentVariation().getSecondaryPattern(), disable);
-			paintCell(cell, diagram.getCurrentVariation().getSecondaryPattern());
+			state.update(name, scene, disable);
 		} finally{
 			graph.getModel().endUpdate();
 		}
@@ -143,17 +144,11 @@ public class EditorController implements PropertyChangeListener{
 	private void paintCell(mxCell cell, String version){
 		Object value = cell.getValue();
 		if (value.getClass().equals(State.class)){
-			if (((State)cell.getValue()).getDisable(version)){
+			if (((State)cell.getValue()).getDisabled()){
 				cell.setStyle("defaultVertex;fillColor=gray");
 			} else {
 				cell.setStyle("defaultVertex");
 			}			
-		}
-	}
-	
-	private void repaintCells(Diagram diagram){
-		for (Object cell : diagram.getGraph().getChildVertices(diagram.getGraph().getDefaultParent())) {
-			paintCell((mxCell) cell, diagram.getCurrentVariation().getSecondaryPattern());
 		}
 	}
 	
@@ -197,11 +192,10 @@ public class EditorController implements PropertyChangeListener{
 	}
 
 	public void createEdgePropertiesDialog(MouseEvent me) {
-		Diagram diagram = model.getCurrentDiagram();
+		Diagram diagram = model.getCurrentDiagramModel().getCurrentAdapter().getDiagram();
 		
 		State state = (State) ((mxCell)(diagram.getCellAt(me.getX(), me.getY()))).getValue();
-		String version = diagram.getCurrentVariation().getSecondaryPattern();
-		StatePropertiesDialog dialog = new StatePropertiesDialog(this, state.getName(version), state.getScene(version),state.getDisable(version), false, me);
+		StatePropertiesDialog dialog = new StatePropertiesDialog(this, state.getName(), state.getScene(),state.getDisabled(), false, me);
 		dialog.setVisible(true);
 	}
 
@@ -213,7 +207,7 @@ public class EditorController implements PropertyChangeListener{
 		try{
 			mxCell cell = (mxCell) (((Diagram) (view.getMap().getSelectedComponent())).getCellAt(me.getX(), me.getY()));
 			Edge edge = (Edge) cell.getValue();
-			edge.update(name, scene, diagram.getCurrentVariation().getSecondaryPattern());
+			edge.update(name, scene);
 		} finally{
 			graph.getModel().endUpdate();
 		}

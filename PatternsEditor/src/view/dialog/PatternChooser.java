@@ -10,6 +10,8 @@ import controller.MainScreenController;
 import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.awt.event.ActionEvent;
@@ -44,12 +46,14 @@ public class PatternChooser extends JDialog {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (table.getSelectedRow()>-1){
-					if (type.equals("version")){
-						controller.createVersion((String) table.getModel().getValueAt(table.getSelectedRow(), 0));
-					} else if (type.equals("diagram")){
+					if (type.equals("diagram")){
 						controller.createDiagram((String) table.getModel().getValueAt(table.getSelectedRow(), 0));
 					} else if (type.equals("adapter")){
-						controller.createAdapter((String) table.getModel().getValueAt(table.getSelectedRow(), 0));
+						List<String> list = new ArrayList<>();
+						for (int i : table.getSelectedRows()) {
+							list.add((String) table.getModel().getValueAt(i, 0));
+						}
+						controller.createAdapter(list);
 					} else {		
 						controller.openDiagram((String) table.getModel().getValueAt(table.getSelectedRow(), 0));
 					}

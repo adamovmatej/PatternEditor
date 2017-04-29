@@ -9,22 +9,23 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import model.DiagramModel;
+import model.EditorModel;
 import model.Pattern;
 import model.PatternModel;
-import model.VariationModel;
+import model.AdapterModel;
 import view.PatternsOverView;
 
 public class PatternOverviewController implements PropertyChangeListener{
 	
 	private PatternsOverView overview = null;
 	private PatternModel patternModel;
-	private DiagramModel diagramModel;
+	private EditorModel editorModel;
 	
 	private String currentPattern;
 	
-	public PatternOverviewController(PatternModel patternModel, DiagramModel diagramModel) {
+	public PatternOverviewController(PatternModel patternModel, EditorModel editorModel) {
 		this.patternModel = patternModel;
-		this.diagramModel = diagramModel;
+		this.editorModel = editorModel;
 		
 		patternModel.addListener(this);
 	}
@@ -42,12 +43,11 @@ public class PatternOverviewController implements PropertyChangeListener{
 	}
 	
 	private void populateVariationTables(String pattern) {
-		VariationModel variationModel = diagramModel.getVariationModel(pattern);
-		if (variationModel == null){
-			variationModel = new VariationModel(pattern, null);			
+		AdapterModel adapterModel = editorModel.getAdapterModel(pattern);
+		if (adapterModel == null){
+			adapterModel = new AdapterModel(pattern, null);			
 		}		
-		overview.getVersionTable().setModel(variationModel.getMainTableModel());
-		overview.getAdapterTable().setModel(variationModel.getSecondaryTableModel());
+		overview.getAdapterTable().setModel(adapterModel.getAdapterTableModel());
 	}
 
 	private void populateTable(){
@@ -104,7 +104,6 @@ public class PatternOverviewController implements PropertyChangeListener{
 	
 	public void removeVersion(){
 		//TODO
-		int selection = overview.getVersionTable().getSelectedRow();
 		//diagramModel.removeVersion((String) overview.getTable().getModel().getValueAt(overview.getTable().getSelectedRow(), 0), selection);
 	}
 	

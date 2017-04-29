@@ -3,12 +3,14 @@ package controller;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.Locale;
 
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 
 import model.DiagramModel;
+import model.EditorModel;
 import model.PatternModel;
 import view.MainScreen;
 import view.dialog.PatternChooser;
@@ -21,20 +23,20 @@ public class MainScreenController implements PropertyChangeListener{
 
 	private MainScreen view;
 	private MainMenuBar bar;
-	private DiagramModel diagramModel;
+	private EditorModel editorModel;
 	private PatternModel patternModel;
 	private PatternOverviewController oveviewController;
 	
 	
-	public MainScreenController(MainScreen mainScreen, MainMenuBar bar, DiagramModel diagramModel, PatternModel patternModel, PatternOverviewController patternOverviewController) {
+	public MainScreenController(MainScreen mainScreen, MainMenuBar bar, EditorModel editorModel, PatternModel patternModel, PatternOverviewController patternOverviewController) {
 		setCurrentLocale(Locale.ENGLISH);
 		
-		diagramModel.addListener(this);
+		editorModel.addListener(this);
 		
 		this.view = mainScreen;
 		this.bar = bar;
 		this.oveviewController = patternOverviewController;
-		this.diagramModel = diagramModel;
+		this.editorModel = editorModel;
 		this.patternModel = patternModel;
 	}
 	
@@ -44,17 +46,7 @@ public class MainScreenController implements PropertyChangeListener{
 	}
 	
 	public void createDiagram(String pattern){
-		diagramModel.createDiagram(pattern);
-	}
-	
-	public void createNewVersionDialog() {
-		PatternChooser dialog = new PatternChooser(this, "version", currentLocale);
-		
-		dialog.setVisible(true);
-	}
-	
-	public void createVersion(String pattern) {
-		diagramModel.createVersion(pattern);
+		editorModel.createDiagramModel(pattern);
 	}
 	
 	public void createNewAdapterDialog(){
@@ -62,8 +54,8 @@ public class MainScreenController implements PropertyChangeListener{
 		dialog.setVisible(true);		
 	}
 	
-	public void createAdapter(String pattern){
-		diagramModel.createAdapter(pattern);
+	public void createAdapter(List<String> patterns) {
+		editorModel.createAdapter(patterns);
 	}
 	
 	public void createOpenDiagramDialog() {
@@ -72,7 +64,8 @@ public class MainScreenController implements PropertyChangeListener{
 	}
 	
 	public void openDiagram(String pattern){
-		diagramModel.open(pattern);
+		//TODO
+		//editorModel.open(pattern);
 	}
 	
 	public void createNewPatternDialog() {
@@ -88,15 +81,6 @@ public class MainScreenController implements PropertyChangeListener{
 			comboBox.setSelectedIndex(0);			
 		}
 	}
-
-	public DiagramModel getDiagramModel() {
-		return diagramModel;
-	}
-
-	public void setDiagramModel(DiagramModel diagramModel) {
-		this.diagramModel = diagramModel;
-	}
-
 
 	public void createNewPattern(String name, String desc) {
 		patternModel.createPattern(name, desc);
@@ -125,7 +109,7 @@ public class MainScreenController implements PropertyChangeListener{
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("changeDiagram") || evt.getPropertyName().equals("newDiagram")){
+		if (evt.getPropertyName().equals("changeDiagram") || evt.getPropertyName().equals("newDiagramModel")){
 			if (evt.getOldValue() == null){
 				bar.chceckDiagramItems(false);
 			} else {
@@ -136,6 +120,6 @@ public class MainScreenController implements PropertyChangeListener{
 	}
 
 	public void saveDiagram() {
-		diagramModel.save();
+		//editorModel.save();
 	}
 }

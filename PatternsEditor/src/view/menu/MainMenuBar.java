@@ -49,14 +49,6 @@ public class MainMenuBar extends JMenuBar{
 			}
 		});
 		
-		newVersion.setEnabled(false);
-		newVersion.addActionListener(new ActionListener() {			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.createNewVersionDialog();
-			}
-		});
-		
 		newAdapter.setEnabled(false);
 		newAdapter.addActionListener(new ActionListener() {			
 			@Override
@@ -92,7 +84,6 @@ public class MainMenuBar extends JMenuBar{
 		file.add(newPattern);
 		file.add(newDiagram);
 		file.addSeparator();
-		file.add(newVersion);
 		file.add(newAdapter);
 		file.addSeparator();
 		file.add(patternOverView);

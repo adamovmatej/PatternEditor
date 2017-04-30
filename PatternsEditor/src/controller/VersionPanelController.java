@@ -34,11 +34,15 @@ public class VersionPanelController implements PropertyChangeListener{
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("newDiagramModel")){
+		if (evt.getPropertyName().equals("newDiagramModel") || evt.getPropertyName().equals("diagramModelChange")){
 			DiagramModel diagramModel = (DiagramModel) evt.getNewValue();
 			AdapterModel versionModel = (AdapterModel) evt.getOldValue();
-			view.getAdapterTable().setModel(versionModel.getAdapterTableModel());
-			selectTableRow(diagramModel.getCurrentAdapter().getLineName());
+			if (versionModel != null){
+				view.getAdapterTable().setModel(versionModel.getAdapterTableModel());
+				selectTableRow(diagramModel.getCurrentAdapter().getLineName());
+			} else {
+				view.getAdapterTable().setModel(new DefaultTableModel());
+			}
 			return;
 		}
 		if (evt.getPropertyName().equals("newAdapter")){

@@ -15,6 +15,7 @@ import model.State;
 import model.db.SQLConnection;
 import view.EditorView;
 import view.MainScreen;
+import view.ToolBarView;
 import view.VersionPanelView;
 import view.menu.MainMenuBar;
 
@@ -22,12 +23,15 @@ public class Main {
 
 	public static void main(String[] args) {
 		
+		//bar.setVisible(true);
+		
 		SQLConnection.getInstance().initDatabase();
 		
 		mxCodecRegistry.register(new mxObjectCodec(new State()));
 		mxCodecRegistry.register(new mxObjectCodec(new Edge()));
 		
 		MainMenuBar mainMenuBar = new MainMenuBar();
+		ToolBarView toolBar = new ToolBarView();
 		VersionPanelView versionPanelView = new VersionPanelView();
 		EditorView editorView = new EditorView(versionPanelView);
 		MainScreen mainScreen = new MainScreen(mainMenuBar, editorView);
@@ -38,12 +42,13 @@ public class Main {
 		EditorController editorController = new EditorController(editorView, editorModel);
 		VersionPanelController versionPanelController = new VersionPanelController(versionPanelView, editorModel);
 		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel, editorModel);
-		MainScreenController mainScreenController = new MainScreenController(mainScreen, mainMenuBar, editorModel, patternModel, patternOverviewController);
+		MainScreenController mainScreenController = new MainScreenController(mainScreen, mainMenuBar, editorModel, patternModel, patternOverviewController, toolBar);
 		
 		versionPanelView.setController(versionPanelController);
 		editorView.setController(editorController);
 		mainMenuBar.setController(mainScreenController);
 		mainScreen.setController(mainScreenController);
+		toolBar.setController(editorController);
 	}
 
 }

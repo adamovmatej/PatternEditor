@@ -13,6 +13,7 @@ import model.DiagramModel;
 import model.EditorModel;
 import model.PatternModel;
 import view.MainScreen;
+import view.ToolBarView;
 import view.dialog.PatternChooser;
 import view.dialog.PatternDialog;
 import view.menu.MainMenuBar;
@@ -26,13 +27,14 @@ public class MainScreenController implements PropertyChangeListener{
 	private EditorModel editorModel;
 	private PatternModel patternModel;
 	private PatternOverviewController oveviewController;
+	private ToolBarView toolBar;
 	
 	
-	public MainScreenController(MainScreen mainScreen, MainMenuBar bar, EditorModel editorModel, PatternModel patternModel, PatternOverviewController patternOverviewController) {
+	public MainScreenController(MainScreen mainScreen, MainMenuBar bar, EditorModel editorModel, PatternModel patternModel, PatternOverviewController patternOverviewController, ToolBarView toolBar) {
 		setCurrentLocale(Locale.ENGLISH);
 		
 		editorModel.addListener(this);
-		
+		this.toolBar = toolBar;
 		this.view = mainScreen;
 		this.bar = bar;
 		this.oveviewController = patternOverviewController;
@@ -64,8 +66,7 @@ public class MainScreenController implements PropertyChangeListener{
 	}
 	
 	public void openDiagram(String pattern){
-		//TODO
-		//editorModel.open(pattern);
+		editorModel.open(pattern);
 	}
 	
 	public void createNewPatternDialog() {
@@ -120,6 +121,10 @@ public class MainScreenController implements PropertyChangeListener{
 	}
 
 	public void saveDiagram() {
-		//editorModel.save();
+		editorModel.save();
+	}
+
+	public void showToolbar() {
+		this.toolBar.setVisible(true);
 	}
 }

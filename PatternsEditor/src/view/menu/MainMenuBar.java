@@ -21,6 +21,7 @@ public class MainMenuBar extends JMenuBar{
 	private MainScreenController controller;
 	
 	private JMenu file = new JMenu();
+	private JMenu show = new JMenu();
 	private JMenu edit = new JMenu();
 	private JMenu help = new JMenu();
 	private JMenu preferences = new JMenu();
@@ -30,6 +31,7 @@ public class MainMenuBar extends JMenuBar{
 	private JMenuItem newVersion = new JMenuItem();
 	private JMenuItem newAdapter = new JMenuItem();
 	private JMenuItem patternOverView = new JMenuItem();
+	private JMenuItem toolbar = new JMenuItem();
 	private JMenuItem save = new JMenuItem();
 	private JMenuItem open = new JMenuItem();	
 		
@@ -81,18 +83,28 @@ public class MainMenuBar extends JMenuBar{
 			}
 		});
 		
+		toolbar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {				
+				controller.showToolbar();
+			}
+		});
+		
 		file.add(newPattern);
 		file.add(newDiagram);
-		file.addSeparator();
-		file.add(newAdapter);
-		file.addSeparator();
-		file.add(patternOverView);
 		file.addSeparator();
 		file.add(save);
 		file.add(open);
 		
+		show.add(patternOverView);
+		show.add(toolbar);
+		
+		edit.add(newAdapter);
+		
 		add(file);
 		add(edit);
+		add(show);
 		add(help);
 }
 
@@ -109,6 +121,7 @@ public class MainMenuBar extends JMenuBar{
 	private void initText(){
 		ResourceBundle bundle = ResourceBundle.getBundle("TextBundle", currentLocale);	
 		
+		show.setText(bundle.getString("menu.show"));
 		file.setText(bundle.getString("menu.file"));
 		edit.setText(bundle.getString("menu.edit"));
 		help.setText(bundle.getString("menu.help"));
@@ -119,6 +132,7 @@ public class MainMenuBar extends JMenuBar{
 		newVersion.setText(bundle.getString("menu.newVersion"));
 		newAdapter.setText(bundle.getString("menu.newAdapter"));
 		patternOverView.setText(bundle.getString("menu.patternOverView"));
+		toolbar.setText(bundle.getString("menu.toolbar"));
 		save.setText(bundle.getString("menu.save"));
 		open.setText(bundle.getString("menu.open"));
 	}

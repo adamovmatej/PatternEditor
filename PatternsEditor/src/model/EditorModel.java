@@ -4,7 +4,6 @@ import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.event.SwingPropertyChangeSupport;
 
 public class EditorModel {
@@ -14,8 +13,10 @@ public class EditorModel {
 	private Map<String, AdapterModel> adapterModels;
 	private DiagramModel currentDiagramModel;
 	private AdapterModel currentAdapterModel;
+	private Boolean highlight;
 	
 	public EditorModel() {
+		highlight = false;
 		diagramModels = new HashMap<String, DiagramModel>();
 		adapterModels = new HashMap<String, AdapterModel>();
 		propertyChangeSupport = new SwingPropertyChangeSupport(this);
@@ -28,10 +29,6 @@ public class EditorModel {
 		adapterModels.put(name, currentAdapterModel);
 		propertyChangeSupport.firePropertyChange("newDiagramModel", currentAdapterModel, currentDiagramModel);
 	}
-	
-	public void addListener(PropertyChangeListener prop){
-		propertyChangeSupport.addPropertyChangeListener(prop);
-	}
 
 	public void changeDiagramModel(String name) {
 		if (!currentDiagramModel.getCurrentAdapter().getPattern().equals(name)){
@@ -39,6 +36,21 @@ public class EditorModel {
 			currentDiagramModel = diagramModels.get(name);
 			propertyChangeSupport.firePropertyChange("diagramModelChange", currentAdapterModel, currentDiagramModel);			
 		}
+	}
+	
+	public void createAdapter(List<String> patterns) {
+		currentDiagramModel.createAdapter(patterns);
+		currentAdapterModel.addAdapter(currentDiagramModel.getCurrentAdapter().getLineName());
+		propertyChangeSupport.firePropertyChange("newAdapter", null, currentDiagramModel.getCurrentAdapter());
+	}	
+
+	public void closeDiagramModel(String pattern) {
+		diagramModels.remove(pattern);
+		adapterModels.remove(pattern);
+	}
+	
+	public void addListener(PropertyChangeListener prop){
+		propertyChangeSupport.addPropertyChangeListener(prop);
 	}
 
 	public Map<String, AdapterModel> getAdapterModels() {
@@ -77,8 +89,24 @@ public class EditorModel {
 		this.currentAdapterModel = currentAdapterModel;
 	}
 
-	public void createAdapter(List<String> patterns) {
-		currentDiagramModel.createAdapter(patterns);
-		currentAdapterModel.addAdapter(currentDiagramModel.getCurrentAdapter().getLineName());
+	public void save() {
+		currentDiagramModel.saveAll();
+	}
+	
+	public void open(String name) {
+		currentDiagramModel = new DiagramModel(name);
+		currentDiagramModel.load(name);
+		diagramModels.put(name, currentDiagramModel);
+		currentAdapterModel = new AdapterModel(currentDiagramModel);
+		adapterModels.put(name, currentAdapterModel);
+		propertyChangeSupport.firePropertyChange("newDiagramModel", currentAdapterModel, currentDiagramModel);
+	}
+
+	public Boolean getHighlight() {
+		return highlight;
+	}
+
+	public void setHighlight(Boolean highlight) {
+		this.highlight = highlight;
 	}
 }

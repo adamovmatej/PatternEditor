@@ -25,15 +25,18 @@ public class AdapterModel {
 	private void initTables(DiagramModel model){
 		adapterTableModel = new DefaultTableModel(new Object[]{"Adapters:"},0);		
 		Map<String, Adapter> adapterMap = model.getAdapters();
+		adapterTableModel.addRow(new Object[]{model.getAdapter("Default\n").getLineName()});
 		for (String key : adapterMap.keySet()) {
-			adapterTableModel.addRow(new Object[]{model.getAdapter(key).getLineName()});
+			if (!key.equals("Default\n")){
+				adapterTableModel.addRow(new Object[]{model.getAdapter(key).getLineName()});
+			}
 		}
 	}
 	
 	private void initTables(String pattern, Connection connection){
 		adapterTableModel = new DefaultTableModel(new Object[]{"Adapters:"},0);
-		
-		String sqlAda = "SELECT secondaryPattern FROM adapter WHERE mainPattern = ?";
+		adapterTableModel.addRow(new Object[]{"Default\n"});
+		String sqlAda = "SELECT name FROM adapter WHERE pattern = ?";
 		Connection con = connection;				
 		if (connection == null){
 			con = SQLConnection.getInstance().getConnection();
@@ -46,7 +49,7 @@ public class AdapterModel {
             pstmtAda.setString(1, pattern);
             ResultSet rs2 = pstmtAda.executeQuery();
             while (rs2.next()){
-            	adapterTableModel.addRow(new Object[]{rs2.getString("secondaryPattern")});
+            	adapterTableModel.addRow(new Object[]{rs2.getString("name")});
             }
         } catch (SQLException e) {
         	System.out.println(sqlAda);
@@ -64,6 +67,7 @@ public class AdapterModel {
 			}
         }
 	}
+	
 	public DefaultTableModel getAdapterTableModel() {
 		return adapterTableModel;
 	}

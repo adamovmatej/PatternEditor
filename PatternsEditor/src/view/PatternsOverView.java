@@ -114,14 +114,6 @@ public class PatternsOverView extends JFrame {
 		adapterTable = new JTable();
 		scrollPane_2.setViewportView(adapterTable);
 		
-		JButton btnRemovAdapters = new JButton("Remove");
-		btnRemovAdapters.setBounds(96, 434, 117, 25);
-		adapters.add(btnRemovAdapters);
-		
-		JButton btnNewAdapters = new JButton("New");
-		btnNewAdapters.setBounds(225, 434, 117, 25);
-		adapters.add(btnNewAdapters);
-		
 		JButton btnPlayAdapters = new JButton("Play");
 		btnPlayAdapters.setBounds(354, 434, 117, 25);
 		adapters.add(btnPlayAdapters);

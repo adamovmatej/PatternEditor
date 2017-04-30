@@ -18,37 +18,26 @@ public final class SQLConnection {
 		Connection connection = null;
 		try {            
             connection = DriverManager.getConnection(url);
-            String dropTable = "DROP TABLE pattern";
     		String patternTable = "CREATE TABLE IF NOT EXISTS pattern (\n"
                     + "	name TEXT PRIMARY KEY,\n"
-                    + " diagramId INTEGER,\n"
                     + " description TEXT,\n"
-                    + " xml TEXT,\n"
-                    + " FOREIGN KEY(diagramId) REFERENCES diagram(id)"
+                    + " xml TEXT"
                     + ");";
     		String adapterTable = "CREATE TABLE IF NOT EXISTS adapter (\n"
-    				+ " id INTEGER PRIMARY KEY,\n"
-    				+ " mainPattern TEXT,\n"
-    				+ " secondaryPattern TEXT,\n"
-    	            + " FOREIGN KEY(mainPattern) REFERENCES pattern(name),\n"
-    	            + " FOREIGN KEY(secondaryPattern) REFERENCES pattern(name)"
-    	            + ");";
-    		String versionTable = "CREATE TABLE IF NOT EXISTS version (\n"
-    				+ " id INTEGER PRIMARY KEY,\n"
-    				+ " mainPattern TEXT,\n"
-    				+ " secondaryPattern TEXT,\n"
-    	            + " FOREIGN KEY(mainPattern) REFERENCES pattern(name),\n"
-    	            + " FOREIGN KEY(secondaryPattern) REFERENCES pattern(name)"
-    	            + ");";
+    				+ " name TEXT PRIMARY KEY,\n"
+    				+ " pattern TEXT,\n"
+    				+ " xml TEXT,\n"
+    	            + " FOREIGN KEY(pattern) REFERENCES pattern(name)"
+    	            + ");";    		
     		
     		Statement stmt;
     		try {
     			stmt = connection.createStatement();
     			//stmt.execute("DROP TABLE version");
     			//stmt.execute("DROP TABLE adapter");
+    			//stmt.execute("DROP TABLE pattern");
     			stmt.execute(patternTable);
     			stmt.execute(adapterTable);
-    			stmt.execute(versionTable);
     		} catch (SQLException e) {
     			System.out.println(e.getMessage());
     		}

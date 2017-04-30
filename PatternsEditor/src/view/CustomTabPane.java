@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import controller.EditorController;
+import model.Diagram;
 
 public class CustomTabPane extends JTabbedPane{
 
@@ -42,14 +43,15 @@ public class CustomTabPane extends JTabbedPane{
 			e1.printStackTrace();
 		}
 		Image icon = image.getScaledInstance(image.getWidth()/6, image.getHeight()/6, java.awt.Image.SCALE_SMOOTH);		
-		JButton closeButton = new JButton(new ImageIcon(icon));
+		ImageIcon iconImage = new ImageIcon(icon);
+		JButton closeButton = new JButton(iconImage);
 		closeButton.setBorder(BorderFactory.createEmptyBorder());
 		closeButton.setContentAreaFilled(false);
 		closeButton.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e){
-				CustomTabPane.this.remove(tab);
-				controller.removeTab(tab);
+				CustomTabPane.this.remove(title);
+				controller.removeTab(title);
 			}
 		});
 		panel.add(closeButton);
@@ -58,7 +60,7 @@ public class CustomTabPane extends JTabbedPane{
 	}
 	
 	public Component add(String title, Component component){
-		Component temp = super.add(component);
+		Component temp = super.add(title, component);
 		this.setTabComponentAt(this.indexOfComponent(temp), generateTabTitle(title, temp));
 		return temp;
 	}
@@ -69,5 +71,13 @@ public class CustomTabPane extends JTabbedPane{
 
 	public void setController(EditorController controller) {
 		this.controller = controller;
+	}
+	
+	public void remove(String title){
+		for (int i=0; i < this.getTabCount(); i++){
+			if (this.getTitleAt(i).equals(title)){
+				this.remove(i);			
+			}
+		}
 	}
 }

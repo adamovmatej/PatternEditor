@@ -1,22 +1,18 @@
 package controller;
 
-import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.concurrent.TimeUnit;
-
 import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.mxgraph.model.mxCell;
-import com.mxgraph.util.mxConstants;
 import com.mxgraph.view.mxGraph;
 
 import controller.listener.ClickMapListener;
 import controller.listener.KeyMapListener;
+import controller.listener.MouseMotionMapListener;
 import controller.listener.MouseWheelListener;
 import model.Adapter;
 import model.Diagram;
@@ -26,7 +22,6 @@ import model.EditorModel;
 import model.State;
 import view.CustomTabPane;
 import view.EditorView;
-import view.VersionPanelView;
 import view.dialog.EdgePropertiesDialog;
 import view.dialog.StatePropertiesDialog;
 import view.menu.RightClickMapMenu;
@@ -45,8 +40,6 @@ public class EditorController implements PropertyChangeListener{
 			public void stateChanged(ChangeEvent e) {
 				if (((CustomTabPane)view.getRightComponent()).getTabCount()>0){
 					editorModel.changeDiagramModel(((Diagram) view.getMap().getComponentAt(view.getMap().getSelectedIndex())).getPattern());					
-				} else {
-					editorModel.changeDiagramModel(null);
 				}
 			}
 		});
@@ -58,27 +51,32 @@ public class EditorController implements PropertyChangeListener{
 		if (evt.getPropertyName().equals("newDiagramModel")){
 			DiagramModel diagramModel = (DiagramModel)evt.getNewValue();
 			diagramModel.addListener(this);
+			initListenersDiagramModel(diagramModel);
 			Diagram diagram = diagramModel.getCurrentAdapter().getDiagram();
-			initListeners(diagram);
 			insertDiagram(diagram);
 			return;
 		}
 		if (evt.getPropertyName().equals("newAdapter")){
 			Diagram diagram = ((Adapter) evt.getNewValue()).getDiagram();
+			initListeners(diagram);
 			view.getMap().setComponentAt(view.getMap().getSelectedIndex(), diagram);
 			return;
 		}
 		if (evt.getPropertyName().equals("adapterChange")){
 			Diagram diagram = (Diagram) evt.getNewValue();
 			view.getMap().setComponentAt(view.getMap().getSelectedIndex(), diagram);
+			view.getMap().repaint();
 			return;
 		}
 	}
 	
-	public void removeTab(Component tab){
-		//TODO
-		Diagram diagram = (Diagram) tab;
-		//model.closeDiagram(diagram);
+	public void removeTab(String name){
+		model.closeDiagramModel(name);
+		if (view.getMap().getTabCount()==0){
+			model.changeDiagramModel(null);
+		} else {
+			model.changeDiagramModel(((Diagram)view.getMap().getSelectedComponent()).getPattern());			
+		}
 	}
 	
 	public void createPropertiesDialog(MouseEvent me){
@@ -169,10 +167,17 @@ public class EditorController implements PropertyChangeListener{
 		view.getMap().setSelectedComponent(diagram);
 	}
 		
+	private void initListenersDiagramModel(DiagramModel diagramModel){
+		for (String key : diagramModel.getAdapters().keySet()){
+			initListeners(diagramModel.getAdapters().get(key).getDiagram());
+		}
+	}
+	
 	private void initListeners(Diagram diagram) {
 		diagram.getGraphControl().addMouseListener(new ClickMapListener(this));
 		diagram.addKeyListener(new KeyMapListener(this));
 		diagram.addMouseWheelListener(new MouseWheelListener(diagram));
+		diagram.getGraphControl().addMouseMotionListener(new MouseMotionMapListener(model, diagram));
 	}
 
 	public void createDeleteDialog() {
@@ -247,4 +252,32 @@ public class EditorController implements PropertyChangeListener{
 		graph.refresh();
 		graph.repaint();
 	}	
+	
+	public void toggleHighlight(Boolean highlight){
+		model.setHighlight(highlight);
+	}
+
+	public void leftClick(MouseEvent me) {
+		if (model.getHighlight()){
+			Diagram diagram = (Diagram)view.getMap().getSelectedComponent();
+			mxGraph graph = diagram.getGraph();
+			
+			graph.getModel().beginUpdate();
+			try{
+				mxCell cell = (mxCell) (((Diagram) (view.getMap().getSelectedComponent())).getCellAt(me.getX(), me.getY()));
+				if (cell != null){
+					if (cell.getStyle() == "fillColor=green"){
+						cell.setStyle(null);				
+					} else if (cell.getStyle() == null){
+						cell.setStyle("fillColor=green");
+					}
+				}
+			} finally{
+				graph.getModel().endUpdate();
+			}
+			
+			graph.refresh();
+			graph.repaint();
+		}
+	}
 }

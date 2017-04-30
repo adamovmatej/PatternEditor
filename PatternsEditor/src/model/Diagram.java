@@ -10,9 +10,12 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 import org.w3c.dom.Document;
 
 import com.mxgraph.io.mxCodec;
+import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxRubberband;
 import com.mxgraph.util.mxConstants;
@@ -65,6 +68,28 @@ public class Diagram extends mxGraphComponent{
 			document = mxXmlUtils.parseXml(URLDecoder.decode(xml, "UTF-8"));
 			mxCodec codec = new mxCodec(document);
 			codec.decode(document.getDocumentElement(), graph.getModel());	
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void xmlCloneIn(String xml, String name){
+		Document document;
+		try {
+			document = mxXmlUtils.parseXml(URLDecoder.decode(xml, "UTF-8"));
+			mxCodec codec = new mxCodec(document);
+			mxGraph temp = new mxGraph();
+			mxCell cell;
+			graph.getModel().beginUpdate();
+			try{
+				cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, name, 30, 30, 100, 50);
+				if (xml!=null){
+					codec.decode(document.getDocumentElement(), temp.getModel());	
+					graph.addCells(temp.cloneCells(temp.getChildCells(temp.getDefaultParent())), cell);				
+				}
+			} finally{
+				graph.getModel().endUpdate();
+			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}

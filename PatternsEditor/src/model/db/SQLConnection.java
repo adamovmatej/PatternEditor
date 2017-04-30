@@ -33,7 +33,6 @@ public final class SQLConnection {
     		Statement stmt;
     		try {
     			stmt = connection.createStatement();
-    			//stmt.execute("DROP TABLE version");
     			//stmt.execute("DROP TABLE adapter");
     			//stmt.execute("DROP TABLE pattern");
     			stmt.execute(patternTable);

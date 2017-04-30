@@ -46,17 +46,23 @@ public class Adapter implements Serializable{
 	}
 	
 	public String getLineName(){
+		String name = "<html>";
+		for (String string : patterns) {
+			name += string + "<br>";
+		}
+		return name.substring(0, name.length()-4)+"</html>";
+	}
+
+	public String getName() {
 		String name = "";
 		for (String string : patterns) {
-			name += string + "\n";
+			name += string + "/n";
 		}
-		return name;
+		return name.substring(0, name.length()-1);
 	}
 	
 	public List<String> getPatternList(String name){
-		System.out.println(name);
-		List<String> items = Arrays.asList(name.split("\\s*\n\\s*"));
-		System.out.println(items.size());
+		List<String> items = Arrays.asList(name.split("\\s*/n\\s*"));
 		return new ArrayList<>(items);
 	}
 	
@@ -86,7 +92,7 @@ public class Adapter implements Serializable{
 		String sql = "INSERT INTO adapter(name,pattern,xml) VALUES(?,?,?)";
 		Connection connection = SQLConnection.getInstance().getConnection();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, getLineName());
+            pstmt.setString(1, getName());
             pstmt.setString(2, pattern);
             pstmt.setString(3, diagram.getXml());
             pstmt.executeUpdate();
@@ -136,5 +142,4 @@ public class Adapter implements Serializable{
 	public void setIsNew(Boolean isNew) {
 		this.isNew = isNew;
 	}
-
 }

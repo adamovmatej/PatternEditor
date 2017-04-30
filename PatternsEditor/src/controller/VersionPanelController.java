@@ -1,8 +1,10 @@
 package controller;
 
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -25,10 +27,8 @@ public class VersionPanelController implements PropertyChangeListener{
 	
 	public VersionPanelController(VersionPanelView view, EditorModel editorModel) {
 		this.view = view;
-		this.model = editorModel;
-		
-		initTables();
-		
+		this.model = editorModel;		
+		initTables();		
 		editorModel.addListener(this);
 	}
 
@@ -36,13 +36,14 @@ public class VersionPanelController implements PropertyChangeListener{
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("newDiagramModel") || evt.getPropertyName().equals("diagramModelChange")){
 			DiagramModel diagramModel = (DiagramModel) evt.getNewValue();
-			AdapterModel versionModel = (AdapterModel) evt.getOldValue();
-			if (versionModel != null){
-				view.getAdapterTable().setModel(versionModel.getAdapterTableModel());
+			AdapterModel adapterModel = (AdapterModel) evt.getOldValue();
+			if (adapterModel != null){
+				view.getAdapterTable().setModel(adapterModel);
 				selectTableRow(diagramModel.getCurrentAdapter().getLineName());
 			} else {
 				view.getAdapterTable().setModel(new DefaultTableModel());
 			}
+			updateTableRowHeights();
 			return;
 		}
 		if (evt.getPropertyName().equals("newAdapter")){
@@ -55,8 +56,12 @@ public class VersionPanelController implements PropertyChangeListener{
 			if (variationModel == null){
 				view.getAdapterTable().setModel(new DefaultTableModel());
 			} else {
-				view.getAdapterTable().setModel(variationModel.getAdapterTableModel());
+				view.getAdapterTable().setModel(variationModel);
 			}
+			return;
+		}
+		if (evt.getPropertyName().equals("tableChange")){
+			updateTableRowHeights();
 			return;
 		}
 	}
@@ -81,5 +86,16 @@ public class VersionPanelController implements PropertyChangeListener{
 				}	
 			}
 		});
+	}
+	
+	public void updateTableRowHeights(){
+		JTable table = view.getAdapterTable();
+		for (int i = 0; i < table.getRowCount(); i++){
+			int rowHeight = table.getRowHeight();
+			Component comp = table.prepareRenderer(table.getCellRenderer(i, 0), i, 0);
+			rowHeight = Math.max(rowHeight, comp.getPreferredSize().height);
+			table.setRowHeight(i, rowHeight);
+		}
+		table.repaint();
 	}
 }

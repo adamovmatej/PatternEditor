@@ -45,7 +45,7 @@ public class DiagramModel {
 
 	public void createAdapter(List<String> patterns){
 		mxGraph graph = new mxGraph();
-		mxGraph def = adapters.get("Default\n").getDiagram().getGraph();
+		mxGraph def = adapters.get("<html>Default</html>").getDiagram().getGraph();
 		mxCell cell;
 		graph.getModel().beginUpdate();
 		try{
@@ -68,7 +68,7 @@ public class DiagramModel {
 			}
 		}
 		if (!list.isEmpty()){
-			JOptionPane.showConfirmDialog(diagram, "Patterns "+list.substring(0, list.length()-2)+" dont have default diagrams!");			
+			JOptionPane.showConfirmDialog(diagram, "Patterns: "+list.substring(0, list.length()-2)+" dont have default diagrams!");			
 		}
 	}
 	
@@ -108,7 +108,7 @@ public class DiagramModel {
 		String sql = "UPDATE pattern SET xml = ? "
                 + "WHERE name = ?";	
 		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {	
-			pstmt.setString(1, adapters.get("Default\n").getDiagram().getXml());
+			pstmt.setString(1, adapters.get("<html>Default</html>").getDiagram().getXml());
 			pstmt.setString(2, pattern);
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
@@ -123,8 +123,6 @@ public class DiagramModel {
 				e.printStackTrace();
 			}
 		}		
-		//TODO
-		//propertyChangeSupport.firePropertyChange("patternUpdate", name, new Pattern(newName, description));
 	}
 	
 	public void loadDefault(){
@@ -161,7 +159,7 @@ public class DiagramModel {
             	String xml = rs.getString("xml");
             	String name = rs.getString("name");
             	Adapter adapter = new Adapter(pattern, name, xml);
-            	adapters.put(name, adapter);
+            	adapters.put(adapter.getLineName(), adapter);
             }
         } catch (SQLException e) {
         	System.out.println(sql);
@@ -182,7 +180,7 @@ public class DiagramModel {
 		Adapter adapter;
 		for (String key : adapters.keySet()) {
 			adapter = adapters.get(key);
-			if (!key.equals("Default\n")){
+			if (!key.equals("<html>Default</html>")){
 				if (adapter.getIsNew()){
 					adapter.insert();
 				} else {
@@ -231,9 +229,9 @@ public class DiagramModel {
 
 	public void changeAdapter(String adapter) {
 		if (adapter == null){
-			adapter = "Default\n";
-			System.out.println(adapter);
+			adapter = "<html>Default</html>";
 		}
+		System.out.println(adapter);
 		currentAdapter = adapters.get(adapter);
 		propertyChangeSupport.firePropertyChange("adapterChange", null, currentAdapter.getDiagram());
 	}

@@ -4,38 +4,34 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
 
 import model.db.SQLConnection;
 
-public class AdapterModel {	
+public class AdapterModel extends DefaultTableModel{	
 	
-	private DefaultTableModel adapterTableModel;
+	private static final long serialVersionUID = 1L;
 	
-	public AdapterModel(DiagramModel model) {
-		initTables(model);
+	public AdapterModel() {
+		super(new Object[]{"Adapters:"},0);		
 	}
 	
-	public AdapterModel(String pattern, Connection connection){
-		initTables(pattern, connection);
-	}
-	
-	private void initTables(DiagramModel model){
-		adapterTableModel = new DefaultTableModel(new Object[]{"Adapters:"},0);		
+	public void initTables(DiagramModel model) {
 		Map<String, Adapter> adapterMap = model.getAdapters();
-		adapterTableModel.addRow(new Object[]{model.getAdapter("Default\n").getLineName()});
+		this.addRow(new Object[]{model.getAdapter("<html>Default</html>").getLineName()});
 		for (String key : adapterMap.keySet()) {
-			if (!key.equals("Default\n")){
-				adapterTableModel.addRow(new Object[]{model.getAdapter(key).getLineName()});
+			if (!key.equals("<html>Default</html>")){
+				this.addRow(new Object[]{model.getAdapter(key).getLineName()});
 			}
 		}
 	}
 	
-	private void initTables(String pattern, Connection connection){
-		adapterTableModel = new DefaultTableModel(new Object[]{"Adapters:"},0);
-		adapterTableModel.addRow(new Object[]{"Default\n"});
+	public void initTables(String pattern, Connection connection){
+		this.addRow(new Object[]{"<html>Default</html>"});
 		String sqlAda = "SELECT name FROM adapter WHERE pattern = ?";
 		Connection con = connection;				
 		if (connection == null){
@@ -49,7 +45,7 @@ public class AdapterModel {
             pstmtAda.setString(1, pattern);
             ResultSet rs2 = pstmtAda.executeQuery();
             while (rs2.next()){
-            	adapterTableModel.addRow(new Object[]{rs2.getString("name")});
+            	this.addRow(new Object[]{getLineName(rs2.getString("name"))});
             }
         } catch (SQLException e) {
         	System.out.println(sqlAda);
@@ -68,15 +64,16 @@ public class AdapterModel {
         }
 	}
 	
-	public DefaultTableModel getAdapterTableModel() {
-		return adapterTableModel;
-	}
-	public void setAdapterTableModel(DefaultTableModel secondaryTableModel) {
-		this.adapterTableModel = secondaryTableModel;
+	public void addAdapter(String name){
+		this.addRow(new Object[]{name});
 	}
 	
-	public void addAdapter(String name){
-		adapterTableModel.addRow(new Object[]{name});
+	private String getLineName(String name){
+		String result="<html>";
+		List<String> items = Arrays.asList(name.split("\\s*/n\\s*"));
+		for (String string : items) {
+			result += string + "<br>";
+		}
+		return result.substring(0, name.length()-4)+"</html>";
 	}
-
 }

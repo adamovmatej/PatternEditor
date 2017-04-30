@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.event.SwingPropertyChangeSupport;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 public class EditorModel {
 	
@@ -25,7 +27,9 @@ public class EditorModel {
 	public void createDiagramModel(String name){
 		currentDiagramModel = new DiagramModel(name);
 		diagramModels.put(name, currentDiagramModel);
-		currentAdapterModel = new AdapterModel(currentDiagramModel);
+		currentAdapterModel = new AdapterModel();
+		initAdapterModelListeners(currentAdapterModel);
+		currentAdapterModel.initTables(currentDiagramModel);
 		adapterModels.put(name, currentAdapterModel);
 		propertyChangeSupport.firePropertyChange("newDiagramModel", currentAdapterModel, currentDiagramModel);
 	}
@@ -97,9 +101,22 @@ public class EditorModel {
 		currentDiagramModel = new DiagramModel(name);
 		currentDiagramModel.load(name);
 		diagramModels.put(name, currentDiagramModel);
-		currentAdapterModel = new AdapterModel(currentDiagramModel);
+		currentAdapterModel = new AdapterModel();
+		initAdapterModelListeners(currentAdapterModel);
+		currentAdapterModel.initTables(currentDiagramModel);
 		adapterModels.put(name, currentAdapterModel);
 		propertyChangeSupport.firePropertyChange("newDiagramModel", currentAdapterModel, currentDiagramModel);
+	}
+	
+	private void initAdapterModelListeners(AdapterModel model){
+		model.addTableModelListener(new TableModelListener() {			
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				if (e.getType() == TableModelEvent.INSERT){
+					propertyChangeSupport.firePropertyChange("tableChange", null, null);					
+				}
+			}
+		});
 	}
 
 	public Boolean getHighlight() {

@@ -45,9 +45,10 @@ public class PatternOverviewController implements PropertyChangeListener{
 	private void populateVariationTables(String pattern) {
 		AdapterModel adapterModel = editorModel.getAdapterModel(pattern);
 		if (adapterModel == null){
-			adapterModel = new AdapterModel(pattern, null);			
+			adapterModel = new AdapterModel();	
+			adapterModel.initTables(pattern, null);
 		}		
-		overview.getAdapterTable().setModel(adapterModel.getAdapterTableModel());
+		overview.getAdapterTable().setModel(adapterModel);
 	}
 
 	private void populateTable(){

@@ -65,9 +65,11 @@ public class Diagram extends mxGraphComponent{
 	public void xmlIn(String xml){
 		Document document;
 		try {
-			document = mxXmlUtils.parseXml(URLDecoder.decode(xml, "UTF-8"));
-			mxCodec codec = new mxCodec(document);
-			codec.decode(document.getDocumentElement(), graph.getModel());	
+			if (xml != null){
+				document = mxXmlUtils.parseXml(URLDecoder.decode(xml, "UTF-8"));
+				mxCodec codec = new mxCodec(document);
+				codec.decode(document.getDocumentElement(), graph.getModel());	
+			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -76,46 +78,23 @@ public class Diagram extends mxGraphComponent{
 	public void xmlCloneIn(String xml, String name){
 		Document document;
 		try {
-			document = mxXmlUtils.parseXml(URLDecoder.decode(xml, "UTF-8"));
-			mxCodec codec = new mxCodec(document);
-			mxGraph temp = new mxGraph();
-			mxCell cell;
-			graph.getModel().beginUpdate();
-			try{
-				cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, name, 30, 30, 100, 50);
-				if (xml!=null){
+			if (xml!=null){
+				document = mxXmlUtils.parseXml(URLDecoder.decode(xml, "UTF-8"));
+				mxCodec codec = new mxCodec(document);
+				mxGraph temp = new mxGraph();
+				mxCell cell;
+				graph.getModel().beginUpdate();
+				try{
+					cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, name, 30, 30, 100, 50);
 					codec.decode(document.getDocumentElement(), temp.getModel());	
 					graph.addCells(temp.cloneCells(temp.getChildCells(temp.getDefaultParent())), cell);				
+				} finally{
+					graph.getModel().endUpdate();
 				}
-			} finally{
-				graph.getModel().endUpdate();
 			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private void dbSaveAdapter(Adapter adapter){
-		/*
-		String sql = "INSERT INTO adapter(mainPattern,secondaryPattern) VALUES(?,?)";
-		Connection connection = SQLConnection.getInstance().getConnection();
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, adapter.getMainPattern());
-            pstmt.setString(2, adapter.getSecondaryPattern());
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-        	System.out.println(sql);
-            System.out.println(e.getMessage());
-        } finally {
-        	try {
-        		if (connection != null){
-        			connection.close();
-        		}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-        }
-        */
 	}
 
 	public String getPattern() {

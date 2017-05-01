@@ -108,6 +108,17 @@ public class EditorModel {
 		propertyChangeSupport.firePropertyChange("newDiagramModel", currentAdapterModel, currentDiagramModel);
 	}
 	
+	public void loadDiagram(String pattern, String name){
+		DiagramModel model = new DiagramModel(pattern);
+		model.setPattern(pattern);
+		if (name.equals("Default")){
+			model.loadDefault();
+		} else {
+			model.loadAdapter(name);
+		}
+		propertyChangeSupport.firePropertyChange("playDiagram", null, model);
+	}
+	
 	private void initAdapterModelListeners(AdapterModel model){
 		model.addTableModelListener(new TableModelListener() {			
 			@Override

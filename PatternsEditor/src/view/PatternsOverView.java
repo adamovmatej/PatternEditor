@@ -115,6 +115,12 @@ public class PatternsOverView extends JFrame {
 		scrollPane_2.setViewportView(adapterTable);
 		
 		JButton btnPlayAdapters = new JButton("Play");
+		btnPlayAdapters.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.playDiagram((String) adapterTable.getValueAt(adapterTable.getSelectedRow(), 0));
+			}
+		});
 		btnPlayAdapters.setBounds(354, 434, 117, 25);
 		adapters.add(btnPlayAdapters);
 

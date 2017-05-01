@@ -6,8 +6,11 @@ import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
@@ -49,6 +52,22 @@ public class Diagram extends mxGraphComponent{
 		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
 		style.put(mxConstants.STYLE_FONTCOLOR, "white");
 		stylesheet.putCellStyle("CIRCLE", style);
+		
+		Hashtable<String, Object> style2 = new Hashtable<String, Object>();	
+		style2.put(mxConstants.STYLE_DASHED, true);
+		stylesheet.putCellStyle("DASHED", style2);
+		
+		Hashtable<String, Object> style3 = new Hashtable<String, Object>();	
+		style3.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP);
+		stylesheet.putCellStyle("PARENT", style3);		
+		
+		Hashtable<String, Object> style4 = new Hashtable<String, Object>();	
+		style4.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP);
+		stylesheet.putCellStyle("PARENT", style4);		
+		
+		Hashtable<String, Object> style5 = new Hashtable<String, Object>();	
+		style5.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP);
+		stylesheet.putCellStyle("PARENT", style5);		
 	}
 	
 	public String getXml(){
@@ -86,8 +105,34 @@ public class Diagram extends mxGraphComponent{
 				graph.getModel().beginUpdate();
 				try{
 					cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, name, 30, 30, 100, 50);
+					cell.setStyle("PARENT");
+					cell.setConnectable(false);
 					codec.decode(document.getDocumentElement(), temp.getModel());	
-					graph.addCells(temp.cloneCells(temp.getChildCells(temp.getDefaultParent())), cell);				
+					List<Object> cells = new ArrayList<Object>(Arrays.asList(temp.getChildCells(temp.getDefaultParent())));
+					for (int i = 0; i < cells.size(); i++) {
+						mxCell c = (mxCell) cells.get(i);
+						if (c.isEdge()){
+							c.setStyle("DASHED");
+							if (c.getValue().getClass().equals(String.class)){
+								c.setValue(new Edge("", "", true));
+							}else {
+								((Edge)c.getValue()).setDisabled(true);
+							}
+						} else if (c.getValue().getClass().equals(String.class)){
+							cells.remove(i);
+						} else {
+							c.setStyle("fillColor=lightgray");
+							((State)c.getValue()).setDisabled(true);
+						}
+					}					
+					graph.addCells(temp.cloneCells(cells.toArray()), cell);	
+					List<Object> toRemove = new ArrayList<>();
+					for (Object object : graph.getChildEdges(cell)) {
+						if (((mxCell)object).getTarget()==null || ((mxCell)object).getSource()==null){
+							toRemove.add(object);
+						}
+					}
+					graph.removeCells(toRemove.toArray());
 				} finally{
 					graph.getModel().endUpdate();
 				}

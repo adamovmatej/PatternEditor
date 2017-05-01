@@ -6,7 +6,9 @@ import com.mxgraph.io.mxObjectCodec;
 import controller.EditorController;
 import controller.MainScreenController;
 import controller.PatternOverviewController;
+import controller.PlayController;
 import controller.VersionPanelController;
+import model.CellNode;
 import model.DiagramModel;
 import model.Edge;
 import model.EditorModel;
@@ -22,11 +24,9 @@ import view.menu.MainMenuBar;
 public class Main {
 
 	public static void main(String[] args) {
-		
-		//bar.setVisible(true);
-		
 		SQLConnection.getInstance().initDatabase();
 		
+		mxCodecRegistry.register(new mxObjectCodec(new CellNode()));
 		mxCodecRegistry.register(new mxObjectCodec(new State()));
 		mxCodecRegistry.register(new mxObjectCodec(new Edge()));
 		
@@ -39,9 +39,10 @@ public class Main {
 		PatternModel patternModel = new PatternModel();
 		EditorModel editorModel = new EditorModel();
 		
+		PlayController playController = new PlayController();
 		EditorController editorController = new EditorController(editorView, editorModel);
 		VersionPanelController versionPanelController = new VersionPanelController(versionPanelView, editorModel);
-		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel, editorModel);
+		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel, editorModel, playController);
 		MainScreenController mainScreenController = new MainScreenController(mainScreen, mainMenuBar, editorModel, patternModel, patternOverviewController, toolBar);
 		
 		versionPanelView.setController(versionPanelController);

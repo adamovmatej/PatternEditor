@@ -34,15 +34,12 @@ public class ClickMapListener extends MouseAdapter {
 	}
 	
 	private void rightClick(MouseEvent e){
-		System.out.println("RIGHTCLICK");
 		if (e.isPopupTrigger()){
-			System.out.println("RIGHTCLICK");
 			controller.rightClick(e);
 		}
 	}
 	
 	private void leftClick(MouseEvent e){
-		System.out.println("LEFTCLICK");
 		controller.leftClick(e);
 	}
 }

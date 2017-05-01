@@ -1,91 +1,61 @@
 package model;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.Serializable;
-import java.util.Map;
 
-public class CellNode implements Serializable, PropertyChangeListener {
+public class CellNode implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	protected String currentVariation;
-	protected Map<String, String> scenes;
-	protected Map<String, String> names;
-	protected Map<String, Boolean> disabled;
-	
-	public void update(String name, String scene, String version, Boolean disable){
-		if (scenes.containsKey(version)){
-			scenes.replace(version, scene);			
-		} else {
-			scenes.put(version, scene);
-		}
-		if (names.containsKey(version)){
-			names.replace(version, name);			
-		} else {
-			names.put(version, name);
-		}
-		if (disabled.containsKey(version)){
-			disabled.replace(version, disable);
-		} else {
-			disabled.put(version, disable);
-		}
+	private String scene;
+	private String name;
+	private Boolean disabled;
+
+	public CellNode(){
 	}
 	
-	public void update(String name, String scene, String version){
-		if (scenes.containsKey(version)){
-			scenes.replace(version, scene);			
-		} else {
-			scenes.put(version, scene);
-		}
-		if (names.containsKey(version)){
-			names.replace(version, name);			
-		} else {
-			names.put(version, name);
-		}
+	public CellNode(String name, String scene, Boolean disable) {
+		this.setName(name);
+		this.setScene(scene);
+		this.setDisabled(disable);
 	}
 	
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("variationChange") || evt.getPropertyName().equals("newVariation")){
-			currentVariation = ((Variation) evt.getNewValue()).getSecondaryPattern();
-		}
+	public void update(String name, String scene, Boolean disable){
+		this.setName(name);
+		this.setScene(scene);
+		this.setDisabled(disable);
 	}	
 	
-	public String getScene(String version){
-		String result = scenes.get(version);
-		if (!(result==null)){
-			return result;
-		} else {
-			String def = scenes.get("Default");
-			if (!(def==null)){
-				return def;
-			} else {
-				return "Default - empty";
-			}
-		}
-	}
+	public void update(String name, String scene){
+		this.setName(name);
+		this.setScene(scene);
+	}	
 	
-	public String getName(String version){
-		String result = names.get(version);
-		if (!(result==null)){
-			return result;
-		} else {
-			String def = names.get("Default");
-			if (!(def==null)){
-				return def;
-			} else {
-				return "Default - empty";
-			}
-		}
+	@Override
+	public String toString() {
+		return name;
 	}
-	
-	public Boolean getDisable(String version){
-		Boolean result = disabled.get(version);
-		if (!(result==null)){
-			return result;
-		} else {
-			return false;
-		}
+
+	public String getScene() {
+		return scene;
 	}
+
+	public void setScene(String scene) {
+		this.scene = scene;
+	}
+
+	public Boolean getDisabled() {
+		return disabled;
+	}
+
+	public void setDisabled(Boolean disabled) {
+		this.disabled = disabled;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}	
 }

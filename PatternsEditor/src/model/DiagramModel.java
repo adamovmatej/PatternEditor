@@ -50,10 +50,11 @@ public class DiagramModel {
 		graph.getModel().beginUpdate();
 		try{
 			cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "Default", 30, 30, 100, 50);
+			cell.setStyle("PARENT");
+			graph.addCells(def.cloneCells(def.getChildCells(def.getDefaultParent())), cell);
 		} finally{
 			graph.getModel().endUpdate();
 		}
-		graph.addCells(def.cloneCells(def.getChildCells(def.getDefaultParent())), cell);
 		Diagram diagram = new Diagram(graph, pattern);
 		getDefaulDiagrams(patterns, diagram);
 		currentAdapter = new Adapter(pattern, patterns, diagram);
@@ -68,7 +69,7 @@ public class DiagramModel {
 			}
 		}
 		if (!list.isEmpty()){
-			JOptionPane.showConfirmDialog(diagram, "Patterns: "+list.substring(0, list.length()-2)+" dont have default diagrams!");			
+			JOptionPane.showMessageDialog(diagram, "Patterns: "+list.substring(0, list.length()-2)+" dont have default diagrams!");			
 		}
 	}
 	
@@ -160,6 +161,30 @@ public class DiagramModel {
             	String name = rs.getString("name");
             	Adapter adapter = new Adapter(pattern, name, xml);
             	adapters.put(adapter.getLineName(), adapter);
+            }
+        } catch (SQLException e) {
+        	System.out.println(sql);
+            System.out.println(e.getMessage());
+        } finally {
+        	try {
+        		if (connection != null){
+        			connection.close();
+        		}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+        }
+	}
+	
+	public void loadAdapter(String name){
+		String sql = "SELECT xml FROM adapter WHERE pattern = ? AND name = ?";
+		Connection connection = SQLConnection.getInstance().getConnection();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, pattern);
+            pstmt.setString(2, name);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()){
+            	currentAdapter = new Adapter(pattern, name, rs.getString("xml"));
             }
         } catch (SQLException e) {
         	System.out.println(sql);

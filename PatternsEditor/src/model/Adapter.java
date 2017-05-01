@@ -56,13 +56,13 @@ public class Adapter implements Serializable{
 	public String getName() {
 		String name = "";
 		for (String string : patterns) {
-			name += string + "/n";
+			name += string + " / ";
 		}
-		return name.substring(0, name.length()-1);
+		return name.substring(0, name.lastIndexOf("/")-1);
 	}
 	
 	public List<String> getPatternList(String name){
-		List<String> items = Arrays.asList(name.split("\\s*/n\\s*"));
+		List<String> items = Arrays.asList(name.split("\\s*/\\s*"));
 		return new ArrayList<>(items);
 	}
 	

@@ -31,7 +31,7 @@ public class AdapterModel extends DefaultTableModel{
 	}
 	
 	public void initTables(String pattern, Connection connection){
-		this.addRow(new Object[]{"<html>Default</html>"});
+		this.addRow(new Object[]{"Default"});
 		String sqlAda = "SELECT name FROM adapter WHERE pattern = ?";
 		Connection con = connection;				
 		if (connection == null){
@@ -45,7 +45,8 @@ public class AdapterModel extends DefaultTableModel{
             pstmtAda.setString(1, pattern);
             ResultSet rs2 = pstmtAda.executeQuery();
             while (rs2.next()){
-            	this.addRow(new Object[]{getLineName(rs2.getString("name"))});
+            	System.out.println(rs2.getString("name"));
+            	this.addRow(new Object[]{rs2.getString("name")});
             }
         } catch (SQLException e) {
         	System.out.println(sqlAda);
@@ -70,10 +71,10 @@ public class AdapterModel extends DefaultTableModel{
 	
 	private String getLineName(String name){
 		String result="<html>";
-		List<String> items = Arrays.asList(name.split("\\s*/n\\s*"));
+		List<String> items = Arrays.asList(name.split("\\s*/\\s*"));
 		for (String string : items) {
 			result += string + "<br>";
 		}
-		return result.substring(0, name.length()-4)+"</html>";
+		return result.substring(0, result.length()-4)+"</html>";
 	}
 }

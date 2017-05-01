@@ -13,21 +13,25 @@ import model.EditorModel;
 import model.Pattern;
 import model.PatternModel;
 import model.AdapterModel;
+import model.Diagram;
 import view.PatternsOverView;
 
 public class PatternOverviewController implements PropertyChangeListener{
 	
 	private PatternsOverView overview = null;
+	private PlayController playController;
 	private PatternModel patternModel;
 	private EditorModel editorModel;
 	
 	private String currentPattern;
 	
-	public PatternOverviewController(PatternModel patternModel, EditorModel editorModel) {
+	public PatternOverviewController(PatternModel patternModel, EditorModel editorModel, PlayController playController) {
+		this.playController = playController;
 		this.patternModel = patternModel;
 		this.editorModel = editorModel;
 		
 		patternModel.addListener(this);
+		editorModel.addListener(this);
 	}
 	
 	public void showPatternOverview() {
@@ -42,12 +46,9 @@ public class PatternOverviewController implements PropertyChangeListener{
 		}		
 	}
 	
-	private void populateVariationTables(String pattern) {
-		AdapterModel adapterModel = editorModel.getAdapterModel(pattern);
-		if (adapterModel == null){
-			adapterModel = new AdapterModel();	
-			adapterModel.initTables(pattern, null);
-		}		
+	private void populateAdapterTable(String pattern) {
+		AdapterModel adapterModel = new AdapterModel();	
+		adapterModel.initTables(pattern, null);
 		overview.getAdapterTable().setModel(adapterModel);
 	}
 
@@ -74,7 +75,7 @@ public class PatternOverviewController implements PropertyChangeListener{
 	
 	private void initPatternInformation(String name){
 		Pattern pattern = patternModel.dbGetPattern(name);
-		populateVariationTables(name);
+		populateAdapterTable(name);
 		overview.showOverview(pattern.getName(), pattern.getDescription());
 	}
 
@@ -89,6 +90,12 @@ public class PatternOverviewController implements PropertyChangeListener{
 			updateTable((String) evt.getOldValue(), pattern.getName());
 			return;
 		}
+		if (evt.getPropertyName().equals("playDiagram")){
+			Diagram diagram = ((DiagramModel)evt.getNewValue()).getCurrentAdapter().getDiagram();
+			playController.showView();
+			playController.play(diagram);
+			return;
+		}
 	}
 	
 	private void updateTable(String oldName, String newName){
@@ -101,6 +108,10 @@ public class PatternOverviewController implements PropertyChangeListener{
 				return;
 			}
 		}
+	}
+	
+	public void playDiagram(String adapter){
+		editorModel.loadDiagram(currentPattern, adapter);
 	}
 	
 	public void removeVersion(){

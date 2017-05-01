@@ -15,6 +15,7 @@ import controller.listener.KeyMapListener;
 import controller.listener.MouseMotionMapListener;
 import controller.listener.MouseWheelListener;
 import model.Adapter;
+import model.CellNode;
 import model.Diagram;
 import model.DiagramModel;
 import model.Edge;
@@ -111,6 +112,11 @@ public class EditorController implements PropertyChangeListener{
 		graph.getModel().beginUpdate();
 		try{
 			mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, state, me.getX(), me.getY(), 100, 50);
+			if (disable){
+				cell.setStyle("fillColor=lightgray");
+			} else {
+				cell.setStyle("fillColor=lightgreen");
+			}
 		} finally{
 			graph.getModel().endUpdate();
 		}			
@@ -127,8 +133,10 @@ public class EditorController implements PropertyChangeListener{
 		try{
 			mxCell cell = (mxCell) (((Diagram) (view.getMap().getSelectedComponent())).getCellAt(me.getX(), me.getY()));
 			State state = (State) cell.getValue();
-			if (state == null){
-				state = new State();
+			if (disable){
+				cell.setStyle("fillColor=lightgray");
+			} else {
+				cell.setStyle("fillColor=lightgreen");
 			}
 			state.update(name, scene, disable);
 		} finally{
@@ -137,17 +145,6 @@ public class EditorController implements PropertyChangeListener{
 		
 		graph.refresh();
 		graph.repaint();
-	}
-	
-	private void paintCell(mxCell cell, String version){
-		Object value = cell.getValue();
-		if (value.getClass().equals(State.class)){
-			if (((State)cell.getValue()).getDisabled()){
-				cell.setStyle("defaultVertex;fillColor=gray");
-			} else {
-				cell.setStyle("defaultVertex");
-			}			
-		}
 	}
 	
 	public void rightClick(MouseEvent e) {
@@ -266,10 +263,27 @@ public class EditorController implements PropertyChangeListener{
 			try{
 				mxCell cell = (mxCell) (((Diagram) (view.getMap().getSelectedComponent())).getCellAt(me.getX(), me.getY()));
 				if (cell != null){
-					if (cell.getStyle() == "fillColor=green"){
-						cell.setStyle(null);				
-					} else if (cell.getStyle() == null){
-						cell.setStyle("fillColor=green");
+					if (cell.isEdge()){
+						if (cell.getValue().getClass().equals(String.class)){
+							cell.setValue(new Edge("", "", false));
+						}
+						Edge node = (Edge) cell.getValue();
+						if (node.getDisabled()){
+							node.setDisabled(false);
+							cell.setStyle(null);
+						} else {
+							node.setDisabled(true);
+							cell.setStyle("DASHED");
+						}
+					} else if (!(cell.getValue().getClass().equals(String.class))) {
+						State node = (State) cell.getValue();
+						if (cell.getStyle().equals("fillColor=lightgreen")){
+							node.setDisabled(true);
+							cell.setStyle("fillColor=lightgray");
+						} else if (cell.getStyle().equals("fillColor=lightgray")){
+							node.setDisabled(false);
+							cell.setStyle("fillColor=lightgreen");
+						}						
 					}
 				}
 			} finally{

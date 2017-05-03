@@ -50,7 +50,7 @@ public class CustomTabPane extends JTabbedPane{
 		closeButton.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e){
-				CustomTabPane.this.remove(title);
+				//CustomTabPane.this.remove(title);
 				controller.removeTab(title);
 			}
 		});

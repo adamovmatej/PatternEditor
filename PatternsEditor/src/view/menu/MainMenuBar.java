@@ -33,7 +33,11 @@ public class MainMenuBar extends JMenuBar{
 	private JMenuItem patternOverView = new JMenuItem();
 	private JMenuItem toolbar = new JMenuItem();
 	private JMenuItem save = new JMenuItem();
-	private JMenuItem open = new JMenuItem();	
+	private JMenuItem open = new JMenuItem();
+	private JMenuItem closeDiagram = new JMenuItem();
+	private JMenuItem closeAll = new JMenuItem();
+	private JMenuItem exit = new JMenuItem();
+	private JMenuItem saveAll = new JMenuItem();
 		
 	public MainMenuBar() {
 		
@@ -67,27 +71,52 @@ public class MainMenuBar extends JMenuBar{
 		});
 		
 		save.setEnabled(false);
-		save.addActionListener(new ActionListener() {
-			
+		save.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				controller.saveDiagram();
 			}
 		});
 		
-		open.addActionListener(new ActionListener() {
-			
+		open.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {				
 				controller.createOpenDiagramDialog();
 			}
 		});
 		
-		toolbar.addActionListener(new ActionListener() {
-			
+		toolbar.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {				
 				controller.showToolbar();
+			}
+		});
+		closeDiagram.setEnabled(false);
+		closeDiagram.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {				
+				controller.removeTab();
+			}
+		});
+		closeAll.setEnabled(false);
+		closeAll.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.removeAllTabs();
+			}
+		});
+		saveAll.setEnabled(false);
+		saveAll.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.saveAll();
+			}
+		});
+		
+		exit.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.exit();
 			}
 		});
 		
@@ -95,12 +124,17 @@ public class MainMenuBar extends JMenuBar{
 		file.add(newDiagram);
 		file.addSeparator();
 		file.add(save);
+		file.add(saveAll);
 		file.add(open);
+		file.addSeparator();
+		file.add(closeAll);
+		file.add(exit);
 		
 		show.add(patternOverView);
 		show.add(toolbar);
 		
 		edit.add(newAdapter);
+		edit.add(closeDiagram);
 		
 		add(file);
 		add(edit);
@@ -135,9 +169,16 @@ public class MainMenuBar extends JMenuBar{
 		toolbar.setText(bundle.getString("menu.toolbar"));
 		save.setText(bundle.getString("menu.save"));
 		open.setText(bundle.getString("menu.open"));
+		closeDiagram.setText(bundle.getString("menu.closeDiagram"));
+		closeAll.setText(bundle.getString("menu.closeAll"));
+		exit.setText(bundle.getString("menu.exit"));
+		saveAll.setText(bundle.getString("menu.saveAll"));
 	}
 
 	public void chceckDiagramItems(Boolean enabled) {
+		closeDiagram.setEnabled(enabled);
+		closeAll.setEnabled(enabled);
+		saveAll.setEnabled(enabled);
 		save.setEnabled(enabled);
 		newAdapter.setEnabled(enabled);
 		newVersion.setEnabled(enabled);

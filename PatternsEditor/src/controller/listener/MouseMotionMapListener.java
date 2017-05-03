@@ -28,7 +28,7 @@ public class MouseMotionMapListener implements MouseMotionListener {
 		final int x = e.getX();
         final int y = e.getY();
         final Rectangle cellBounds = new Rectangle(diagram.getBounds());
-        if (cellBounds != null && cellBounds.contains(x, y) && model.getHighlight()){
+        if (cellBounds != null && cellBounds.contains(x, y) && model.getTool()==1){
         	diagram.getGraphControl().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
         }
 	}

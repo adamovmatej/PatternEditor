@@ -15,19 +15,21 @@ public class RightClickCellMenu extends JPopupMenu {
 	private JMenuItem properties;
 	private JMenuItem delete;
 	
-    public RightClickCellMenu(EditorController controller, MouseEvent me){
+    public RightClickCellMenu(EditorController controller, Boolean prop, MouseEvent me){
+    	if (prop){
+    		properties  = new JMenuItem("Properties");
+    		properties.addActionListener(new ActionListener() {	
+    			@Override
+    			public void actionPerformed(ActionEvent e) {
+    				controller.createPropertiesDialog(me);				
+    			}
+    			
+    		});    		
+    		this.add(properties);
+    	}
     	
-    	properties  = new JMenuItem("Properties");
+    	
     	delete = new JMenuItem("Delete");
-    	
-    	properties.addActionListener(new ActionListener() {	
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				controller.createPropertiesDialog(me);				
-			}
-			
-		});
-    	
     	delete.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -35,7 +37,6 @@ public class RightClickCellMenu extends JPopupMenu {
 			}
 		});
     	
-        this.add(properties);
         this.add(delete);
     }
 }

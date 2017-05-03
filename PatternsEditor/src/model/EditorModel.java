@@ -15,10 +15,10 @@ public class EditorModel {
 	private Map<String, AdapterModel> adapterModels;
 	private DiagramModel currentDiagramModel;
 	private AdapterModel currentAdapterModel;
-	private Boolean highlight;
+	private int tool;
 	
 	public EditorModel() {
-		highlight = false;
+		tool = 0;
 		diagramModels = new HashMap<String, DiagramModel>();
 		adapterModels = new HashMap<String, AdapterModel>();
 		propertyChangeSupport = new SwingPropertyChangeSupport(this);
@@ -130,11 +130,17 @@ public class EditorModel {
 		});
 	}
 
-	public Boolean getHighlight() {
-		return highlight;
+	public void saveAll() {
+		for (String key: diagramModels.keySet()) {
+			diagramModels.get(key).saveAll();
+		}
 	}
 
-	public void setHighlight(Boolean highlight) {
-		this.highlight = highlight;
+	public int getTool() {
+		return tool;
+	}
+
+	public void setTool(int tool) {
+		this.tool = tool;
 	}
 }

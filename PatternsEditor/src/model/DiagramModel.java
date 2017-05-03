@@ -45,17 +45,18 @@ public class DiagramModel {
 
 	public void createAdapter(List<String> patterns){
 		mxGraph graph = new mxGraph();
+		Diagram diagram = new Diagram(graph, pattern);
 		mxGraph def = adapters.get("<html>Default</html>").getDiagram().getGraph();
 		mxCell cell;
 		graph.getModel().beginUpdate();
 		try{
 			cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "Default", 30, 30, 100, 50);
 			cell.setStyle("PARENT");
+			cell.setConnectable(false);
 			graph.addCells(def.cloneCells(def.getChildCells(def.getDefaultParent())), cell);
 		} finally{
 			graph.getModel().endUpdate();
 		}
-		Diagram diagram = new Diagram(graph, pattern);
 		getDefaulDiagrams(patterns, diagram);
 		currentAdapter = new Adapter(pattern, patterns, diagram);
 		adapters.put(currentAdapter.getLineName(), currentAdapter);

@@ -15,7 +15,6 @@ import controller.listener.KeyMapListener;
 import controller.listener.MouseMotionMapListener;
 import controller.listener.MouseWheelListener;
 import model.Adapter;
-import model.CellNode;
 import model.Diagram;
 import model.DiagramModel;
 import model.Edge;
@@ -23,8 +22,7 @@ import model.EditorModel;
 import model.State;
 import view.CustomTabPane;
 import view.EditorView;
-import view.dialog.EdgePropertiesDialog;
-import view.dialog.StatePropertiesDialog;
+import view.dialog.CellPropertiesDialog;
 import view.menu.RightClickMapMenu;
 import view.menu.RightClickCellMenu;
 
@@ -72,6 +70,18 @@ public class EditorController implements PropertyChangeListener{
 	}
 	
 	public void removeTab(String name){
+		view.getMap().remove(name);
+		model.closeDiagramModel(name);
+		if (view.getMap().getTabCount()==0){
+			model.changeDiagramModel(null);
+		} else {
+			model.changeDiagramModel(((Diagram)view.getMap().getSelectedComponent()).getPattern());			
+		}
+	}
+	
+	public void removeTab(){
+		String name = view.getMap().getTitleAt(view.getMap().getSelectedIndex());
+		view.getMap().remove(name);
 		model.closeDiagramModel(name);
 		if (view.getMap().getTabCount()==0){
 			model.changeDiagramModel(null);
@@ -89,18 +99,17 @@ public class EditorController implements PropertyChangeListener{
 				cell.setValue(new Edge());
 			}
 			Edge edge = (Edge) cell.getValue();
-			EdgePropertiesDialog dialog = new EdgePropertiesDialog(this, edge.getName(), edge.getScene(), me);
+			CellPropertiesDialog dialog = new CellPropertiesDialog(this, edge.getName(), edge.getScene(), edge.getDisabled(), false, false, me);
 			dialog.setVisible(true);
 		} else{
 			State state = (State) cell.getValue();
-			StatePropertiesDialog dialog = new StatePropertiesDialog(this, state.getName(), state.getScene(),state.getDisabled(), false, me);
+			CellPropertiesDialog dialog = new CellPropertiesDialog(this, state.getName(), state.getScene(),state.getDisabled(), false, true, me);
 			dialog.setVisible(true);
 		}
-		
 	}
-	
+
 	public void createStateDialog(MouseEvent me) {
-		StatePropertiesDialog dialog = new StatePropertiesDialog(this, null, null, false, true, me);
+		CellPropertiesDialog dialog = new CellPropertiesDialog(this, null, null, false, true, true, me);
 		dialog.setVisible(true);
 	}
 	
@@ -151,8 +160,13 @@ public class EditorController implements PropertyChangeListener{
 		Diagram diagram = (Diagram) view.getMap().getSelectedComponent();
 
 		if ((diagram.getGraph().getModel().isVertex(diagram.getCellAt(e.getX(), e.getY()))) || (diagram.getGraph().getModel().isEdge(diagram.getCellAt(e.getX(), e.getY())))){
-			RightClickCellMenu menu = new RightClickCellMenu(this, e);
-			menu.show(e.getComponent(), e.getX(), e.getY());
+			if (((mxCell)diagram.getCellAt(e.getX(), e.getY())).isVertex() && ((mxCell)diagram.getCellAt(e.getX(), e.getY())).getValue().getClass().equals(String.class)){
+				RightClickCellMenu menu = new RightClickCellMenu(this, false, e);
+				menu.show(e.getComponent(), e.getX(), e.getY());
+			} else {
+				RightClickCellMenu menu = new RightClickCellMenu(this, true, e);
+				menu.show(e.getComponent(), e.getX(), e.getY());
+			}
 		} else {
 			RightClickMapMenu menu = new RightClickMapMenu(this, e);
 			menu.show(e.getComponent(), e.getX(), e.getY());			
@@ -193,15 +207,7 @@ public class EditorController implements PropertyChangeListener{
 		}
 	}
 
-	public void createEdgePropertiesDialog(MouseEvent me) {
-		Diagram diagram = model.getCurrentDiagramModel().getCurrentAdapter().getDiagram();
-		
-		State state = (State) ((mxCell)(diagram.getCellAt(me.getX(), me.getY()))).getValue();
-		StatePropertiesDialog dialog = new StatePropertiesDialog(this, state.getName(), state.getScene(),state.getDisabled(), false, me);
-		dialog.setVisible(true);
-	}
-
-	public void updateEdge(String name, String scene, MouseEvent me) {
+	public void updateEdge(String name, String scene, Boolean disable, MouseEvent me) {
 		Diagram diagram = (Diagram)view.getMap().getSelectedComponent();
 		mxGraph graph = diagram.getGraph();
 		
@@ -209,7 +215,12 @@ public class EditorController implements PropertyChangeListener{
 		try{
 			mxCell cell = (mxCell) (((Diagram) (view.getMap().getSelectedComponent())).getCellAt(me.getX(), me.getY()));
 			Edge edge = (Edge) cell.getValue();
-			edge.update(name, scene);
+			if (disable){
+				cell.setStyle("DASHED");
+			} else {
+				cell.setStyle(null);
+			}
+			edge.update(name, scene, disable);
 		} finally{
 			graph.getModel().endUpdate();
 		}
@@ -250,12 +261,15 @@ public class EditorController implements PropertyChangeListener{
 		graph.repaint();
 	}	
 	
-	public void toggleHighlight(Boolean highlight){
-		model.setHighlight(highlight);
+	public void selectTool(int tool){
+		model.setTool(tool);
 	}
 
 	public void leftClick(MouseEvent me) {
-		if (model.getHighlight()){
+		int tool = model.getTool();
+		
+		switch (tool) {
+		case 1:
 			Diagram diagram = (Diagram)view.getMap().getSelectedComponent();
 			mxGraph graph = diagram.getGraph();
 			
@@ -292,6 +306,27 @@ public class EditorController implements PropertyChangeListener{
 			
 			graph.refresh();
 			graph.repaint();
+			break;
+		case 2:
+			createStateDialog(me);
+			model.setTool(0);
+			break;
+		case 3:
+			createStart(me);
+			model.setTool(0);
+			break;
+		case 4:
+			createEnd(me);
+			model.setTool(0);
+			break;
+		default:
+			break;
+		}
+	}
+
+	public void removeAllTabs() {
+		while (view.getMap().getSelectedIndex()>-1){
+			removeTab();
 		}
 	}
 }

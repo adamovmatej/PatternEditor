@@ -27,10 +27,11 @@ public class MainScreenController implements PropertyChangeListener{
 	private EditorModel editorModel;
 	private PatternModel patternModel;
 	private PatternOverviewController oveviewController;
+	private EditorController editorController;
 	private ToolBarView toolBar;
 	
 	
-	public MainScreenController(MainScreen mainScreen, MainMenuBar bar, EditorModel editorModel, PatternModel patternModel, PatternOverviewController patternOverviewController, ToolBarView toolBar) {
+	public MainScreenController(MainScreen mainScreen, MainMenuBar bar, EditorModel editorModel, PatternModel patternModel, PatternOverviewController patternOverviewController, EditorController editorController, ToolBarView toolBar) {
 		setCurrentLocale(Locale.ENGLISH);
 		
 		editorModel.addListener(this);
@@ -38,6 +39,7 @@ public class MainScreenController implements PropertyChangeListener{
 		this.view = mainScreen;
 		this.bar = bar;
 		this.oveviewController = patternOverviewController;
+		this.editorController = editorController;
 		this.editorModel = editorModel;
 		this.patternModel = patternModel;
 	}
@@ -110,7 +112,7 @@ public class MainScreenController implements PropertyChangeListener{
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("changeDiagram") || evt.getPropertyName().equals("newDiagramModel")){
+		if (evt.getPropertyName().equals("diagramModelChange") || evt.getPropertyName().equals("newDiagramModel")){
 			if (evt.getOldValue() == null){
 				bar.chceckDiagramItems(false);
 			} else {
@@ -126,5 +128,21 @@ public class MainScreenController implements PropertyChangeListener{
 
 	public void showToolbar() {
 		this.toolBar.setVisible(true);
+	}
+
+	public void removeTab() {
+		editorController.removeTab();
+	}
+
+	public void saveAll() {
+		editorModel.saveAll();
+	}
+
+	public void exit() {
+		view.dispose();
+	}
+
+	public void removeAllTabs() {
+		editorController.removeAllTabs();
 	}
 }

@@ -16,7 +16,6 @@ public class PlayController {
 	private PlayView view;
 	private Diagram diagram;
 	private Map<String, mxCell> options;
-	private DefaultTableModel tableModel;
 	
 	public PlayController() {
 		options = new HashMap<>();
@@ -51,21 +50,23 @@ public class PlayController {
 			view.dispose();
 			return;
 		} else{
-			tableModel = new DefaultTableModel(new Object[]{"Options"}, 0);
+			DefaultTableModel tableModel = new DefaultTableModel(new Object[]{""}, 0);
 			State state = (State) cell.getValue();
 			view.getTextArea().setText(state.getScene());
 			mxCell edge;
 			Edge value;
 			for (Object c : diagram.getGraph().getOutgoingEdges(cell)) {
 				edge = (mxCell) c;
-				value = (Edge)edge.getValue();
-				if (!value.getDisabled()){
-					System.out.println(value.getScene());
-					options.put(value.getScene(), (mxCell) edge.getTarget());
-					tableModel.addRow(new Object[]{value.getScene()});
+				if (!edge.getValue().getClass().equals(String.class)){
+					value = (Edge)edge.getValue();
+					if (!value.getDisabled()){
+						options.put(value.getScene(), (mxCell) edge.getTarget());
+						tableModel.addRow(new Object[]{value.getScene()});
+					}					
 				}
 			}
 			view.getTable().setModel(tableModel);
+			view.getTable().clearSelection();
 			view.repaint();
 		}
 	}

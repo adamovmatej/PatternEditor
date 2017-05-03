@@ -17,25 +17,18 @@ import java.util.ResourceBundle;
 import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
 public class PatternChooser extends JDialog {
 	
 	private static final long serialVersionUID = 1L;
 	private JTable table;
 	
+	
 	public PatternChooser(MainScreenController controller, String type, Locale locale) {
 		ResourceBundle bundle = ResourceBundle.getBundle("TextBundle", locale);	
-		
-		if (type.equals("version")){
-			setTitle(bundle.getString("title.addVersion"));
-		} else if (type.equals("diagram")){
-			setTitle(bundle.getString("title.newDiagram"));
-		} else if (type.equals("adapter")){
-			setTitle(bundle.getString("title.addAdapter"));
-		} else {
-			setTitle(bundle.getString("title.openDiagram"));
-		}
-		
+		setResizable(false);
+				
 		setModal(true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setAlwaysOnTop(true);
@@ -84,6 +77,17 @@ public class PatternChooser extends JDialog {
 		controller.populateTable(table);
 		table.setTableHeader(null);
 		scrollPane.setViewportView(table);
+		
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		if (type.equals("diagram")){
+			setTitle(bundle.getString("title.newDiagram"));
+		} else if (type.equals("adapter")){
+			table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+			setTitle(bundle.getString("title.addAdapter"));
+		} else {
+			setTitle(bundle.getString("title.openDiagram"));
+		}
+		table.setDefaultEditor(Object.class, null);
 		
 		JLabel lblHeader = new JLabel();
 		if (type.equals("version")){

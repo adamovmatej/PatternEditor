@@ -43,7 +43,7 @@ public class Main {
 		EditorController editorController = new EditorController(editorView, editorModel);
 		VersionPanelController versionPanelController = new VersionPanelController(versionPanelView, editorModel);
 		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel, editorModel, playController);
-		MainScreenController mainScreenController = new MainScreenController(mainScreen, mainMenuBar, editorModel, patternModel, patternOverviewController, toolBar);
+		MainScreenController mainScreenController = new MainScreenController(mainScreen, mainMenuBar, editorModel, patternModel, patternOverviewController, editorController, toolBar);
 		
 		versionPanelView.setController(versionPanelController);
 		editorView.setController(editorController);

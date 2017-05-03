@@ -15,6 +15,7 @@ import controller.PatternOverviewController;
 import javax.swing.JTabbedPane;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 
@@ -31,6 +32,7 @@ public class PatternsOverView extends JFrame {
 	private JTable adapterTable;
 	
 	public PatternsOverView() {
+		setTitle("Pattern overview");
 		setAlwaysOnTop(true);
 		setBounds(200, 200, 750, 500);
 		
@@ -113,6 +115,9 @@ public class PatternsOverView extends JFrame {
 		
 		adapterTable = new JTable();
 		scrollPane_2.setViewportView(adapterTable);
+		
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		adapterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		JButton btnPlayAdapters = new JButton("Play");
 		btnPlayAdapters.addActionListener(new ActionListener() {

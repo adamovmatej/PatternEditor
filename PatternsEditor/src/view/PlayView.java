@@ -1,12 +1,14 @@
 package view;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.text.Document;
+import javax.swing.border.BevelBorder;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import controller.PlayController;
 
@@ -33,7 +35,7 @@ public class PlayView extends JFrame{
 	private PlayController controller;
 	
 	private JTable optionTable;
-	private JTextArea textArea;
+	private JTextPane textPane;
 	
 	public PlayView() {
 		setResizable(false);
@@ -41,31 +43,42 @@ public class PlayView extends JFrame{
 		setBounds(50, 50, 1000, 750);
 		setAlwaysOnTop(true);
 		
-		JPanel panel = new JPanel();
+		BackgroundPane panel = new BackgroundPane("resources/gameimage.png");
 		getContentPane().add(panel);
-		panel.setLayout(null);
+		panel.setLayout(null);	
 		
-		textArea = new JTextArea();
-		textArea.setBounds(12, 12, 976, 479);
-		textArea.setFocusable(false);
-		textArea.setBackground(new Color(0, 0, 0, 0));
-		textArea.setFont(new Font("Arial", Font.BOLD, 18));
-		textArea.setLineWrap(true);
-		panel.add(textArea);
+		StyleContext sc = StyleContext.getDefaultStyleContext();
+        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.WHITE);
 		
-		JScrollPane panel1 = new JScrollPane();
-		panel1.setBounds(12, 503, 912, 235);
-		panel.add(panel1);
-		panel1.setLayout(null);
+		textPane = new JTextPane();
+		textPane.setBounds(12, 12, 976, 479);
+		textPane.setFocusable(false);
+		textPane.setBackground(new Color(0, 0, 0, 0));
+		textPane.setCharacterAttributes(aset, false);
+		textPane.setFont(new Font("Calibri", Font.BOLD, 20));
+		panel.add(textPane);
 		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(12, 503, 912, 235);
+		scrollPane.setLayout(null);
+		scrollPane.setOpaque(false);
+		scrollPane.getViewport().setOpaque(false);
+		scrollPane.setBorder(null);
+		panel.add(scrollPane);
+		
+		CustomCellRenderer rndr = new CustomCellRenderer();
+
 		optionTable = new JTable();
+		optionTable.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 		optionTable.setFillsViewportHeight(true);
 		optionTable.setDefaultEditor(Object.class, null);
 		optionTable.setBounds(0, 0, 912, 235);
-		optionTable.setBackground(new JPanel().getBackground());
+		optionTable.setOpaque(false);	
+		optionTable.setFont(new Font("Calibri", Font.BOLD, 15));
 		optionTable.setRowHeight(optionTable.getHeight()/4);
+		optionTable.setDefaultRenderer(Object.class, rndr);
 		optionTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		panel1.add(optionTable);
+		scrollPane.add(optionTable);
 		
 		BufferedImage image = null;
 		try {
@@ -73,7 +86,7 @@ public class PlayView extends JFrame{
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		Image icon = image.getScaledInstance(image.getWidth()/10, image.getHeight()/10, java.awt.Image.SCALE_SMOOTH);		
+		Image icon = image.getScaledInstance(image.getWidth(), image.getHeight(), java.awt.Image.SCALE_SMOOTH);		
 		ImageIcon iconImage = new ImageIcon(icon);
 		JButton continueButton = new JButton(iconImage);
 		continueButton.setBounds(925, 572, 70, 70);
@@ -90,7 +103,7 @@ public class PlayView extends JFrame{
 			}
 		});
 		panel.add(continueButton);
-		panel.add(panel1);
+		panel.add(scrollPane);
 	}
 
 	public JTable getTable() {
@@ -101,12 +114,12 @@ public class PlayView extends JFrame{
 		this.optionTable = table;
 	}
 
-	public JTextArea getTextArea() {
-		return textArea;
+	public JTextPane getTextPane() {
+		return textPane;
 	}
 
-	public void setTextArea(JTextArea textArea) {
-		this.textArea = textArea;
+	public void setTextPane(JTextPane textPane) {
+		this.textPane = textPane;
 	}
 
 	public PlayController getController() {

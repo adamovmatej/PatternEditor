@@ -3,6 +3,7 @@ package controller;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -43,13 +44,19 @@ public class PatternOverviewController implements PropertyChangeListener{
 		} else{
 			populateTable();
 			overview.setVisible(true);			
-		}		
+		}	
+		if (overview.getTable().getRowCount()>-1){
+			overview.getTable().setRowSelectionInterval(0, 0);
+		}
 	}
 	
 	private void populateAdapterTable(String pattern) {
 		AdapterModel adapterModel = new AdapterModel();	
 		adapterModel.initTables(pattern, null);
 		overview.getAdapterTable().setModel(adapterModel);
+		if (overview.getAdapterTable().getRowCount()>-1){
+			overview.getAdapterTable().setRowSelectionInterval(0, 0);
+		}		
 	}
 
 	private void populateTable(){
@@ -64,8 +71,28 @@ public class PatternOverviewController implements PropertyChangeListener{
 			public void valueChanged(ListSelectionEvent e) {
 				int selected = overview.getTable().getSelectedRow();
 				if (selected > -1){
+					if (overview.getTable().getValueAt(selected, 0).equals("Default")){
+						overview.getBtnDelete().setEnabled(false);
+					} else {
+						overview.getBtnDelete().setEnabled(false);
+					}
 					currentPattern = (String) overview.getTable().getModel().getValueAt(selected, 0);
 					initPatternInformation(currentPattern);	
+				}
+			}
+		});
+		
+		overview.getAdapterTable().getSelectionModel().addListSelectionListener(new ListSelectionListener() {			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				int selected = overview.getAdapterTable().getSelectedRow();
+				if (selected > -1){
+					System.out.println(overview.getAdapterTable().getValueAt(selected, 0));
+					if (overview.getAdapterTable().getValueAt(selected, 0).equals("Default")){
+						overview.getBtnDelete().setEnabled(false);
+					} else {
+						overview.getBtnDelete().setEnabled(true);
+					}
 				}
 			}
 		});
@@ -91,9 +118,14 @@ public class PatternOverviewController implements PropertyChangeListener{
 			return;
 		}
 		if (evt.getPropertyName().equals("playDiagram")){
-			Diagram diagram = ((DiagramModel)evt.getNewValue()).getCurrentAdapter().getDiagram();
-			playController.showView();
-			playController.play(diagram);
+			DiagramModel model = (DiagramModel)evt.getNewValue();
+			if (model == null){
+				JOptionPane.showMessageDialog(overview, "The adapter you chose is not valid.\nIt cannot be played.");
+			} else {
+				Diagram diagram = model.getCurrentAdapter().getDiagram();
+				playController.showView();
+				playController.play(diagram);
+			}
 			return;
 		}
 	}
@@ -111,16 +143,11 @@ public class PatternOverviewController implements PropertyChangeListener{
 	}
 	
 	public void playDiagram(String adapter){
-		editorModel.loadDiagram(currentPattern, adapter);
+		editorModel.loadDiagram(currentPattern, adapter);			
 	}
-	
-	public void removeVersion(){
-		//TODO
-		//diagramModel.removeVersion((String) overview.getTable().getModel().getValueAt(overview.getTable().getSelectedRow(), 0), selection);
-	}
-	
-	public void removeAdapter(){
-		//TODO
+
+	public void deleteAdapter(String adapter) {
 		((DefaultTableModel)overview.getAdapterTable().getModel()).removeRow(overview.getAdapterTable().getSelectedRow());
+		editorModel.deleteAdapter(currentPattern, adapter);
 	}
 }

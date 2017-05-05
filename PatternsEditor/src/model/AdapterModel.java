@@ -77,4 +77,14 @@ public class AdapterModel extends DefaultTableModel{
 		}
 		return result.substring(0, result.length()-4)+"</html>";
 	}
+
+	public void removeRow(Adapter adapter) {
+		for (int i = 0; i < this.getRowCount(); i++) {
+			adapter.getLineName();
+			if (this.getValueAt(i, 0).equals(adapter.getLineName())){
+				this.removeRow(i);
+				return;
+			}
+		}
+	}
 }

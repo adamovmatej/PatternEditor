@@ -19,10 +19,13 @@ import org.w3c.dom.Document;
 
 import com.mxgraph.io.mxCodec;
 import com.mxgraph.model.mxCell;
+import com.mxgraph.model.mxGeometry;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.handler.mxRubberband;
 import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxXmlUtils;
+import com.mxgraph.view.mxEdgeStyle;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxStylesheet;
 
@@ -51,23 +54,42 @@ public class Diagram extends mxGraphComponent{
 		Hashtable<String, Object> style = new Hashtable<String, Object>();
 		style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_ELLIPSE);
 		style.put(mxConstants.STYLE_FONTCOLOR, "white");
+		style.put(mxConstants.STYLE_FILLCOLOR, "black");
 		stylesheet.putCellStyle("CIRCLE", style);
 		
-		Hashtable<String, Object> style2 = new Hashtable<String, Object>();	
+		Hashtable<String, Object> style2 = new Hashtable<String, Object>();
+		style2.put(mxConstants.STYLE_EDGE, mxEdgeStyle.OrthConnector);
+		style2.put(mxConstants.STYLE_STROKEWIDTH, 2);
 		style2.put(mxConstants.STYLE_DASHED, true);
 		stylesheet.putCellStyle("DASHED", style2);
 		
-		Hashtable<String, Object> style3 = new Hashtable<String, Object>();	
+		Hashtable<String, Object> style3 = new Hashtable<String, Object>();
 		style3.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP);
-		stylesheet.putCellStyle("PARENT", style3);		
+		style3.put(mxConstants.STYLE_FILLCOLOR, "#E6E6FA");
+		style3.put(mxConstants.STYLE_ROUNDED, true);
+		style3.put(mxConstants.STYLE_STROKEWIDTH, 2);
+		stylesheet.putCellStyle("PARENT", style3);
 		
-		Hashtable<String, Object> style4 = new Hashtable<String, Object>();	
-		style4.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP);
-		stylesheet.putCellStyle("PARENT", style4);		
+		Hashtable<String, Object> style4 = new Hashtable<String, Object>();
+		style4.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
+		style4.put(mxConstants.STYLE_FILLCOLOR, "#FFFF99");
+		style4.put(mxConstants.STYLE_ROUNDED, true);
+		style4.put(mxConstants.STYLE_STROKEWIDTH, 2);
+		stylesheet.putCellStyle("STATE_ENABLED", style4);		
 		
-		Hashtable<String, Object> style5 = new Hashtable<String, Object>();	
-		style5.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_TOP);
-		stylesheet.putCellStyle("PARENT", style5);		
+		Hashtable<String, Object> style5 = new Hashtable<String, Object>();
+		style5.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
+		style5.put(mxConstants.STYLE_FILLCOLOR, "lightgray");
+		style5.put(mxConstants.STYLE_ROUNDED, true);
+		style5.put(mxConstants.STYLE_STROKEWIDTH, 2);
+		stylesheet.putCellStyle("STATE_DISABLED", style5);
+		
+		Map<String, Object> style6 = graph.getStylesheet().getDefaultEdgeStyle();
+		style6.put(mxConstants.STYLE_EDGE, mxEdgeStyle.OrthConnector);
+		style6.put(mxConstants.STYLE_FONTCOLOR, "black");
+		style6.put(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "#E6E6FA");
+		style6.put(mxConstants.STYLE_STROKEWIDTH, 2);
+	    this.getGraph().getStylesheet().setDefaultEdgeStyle(style6);
 	}
 	
 	public String getXml(){
@@ -94,7 +116,7 @@ public class Diagram extends mxGraphComponent{
 		}
 	}
 	
-	public void xmlCloneIn(String xml, String name){
+	public mxCell xmlCloneIn(String xml, String name, mxCell lastCell){
 		Document document;
 		try {
 			if (xml!=null){
@@ -104,7 +126,9 @@ public class Diagram extends mxGraphComponent{
 				mxCell cell;
 				graph.getModel().beginUpdate();
 				try{
-					cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, name, 30, 30, 100, 50);
+					mxGeometry geo = lastCell.getGeometry();
+					Double x = geo.getCenterX() + geo.getWidth()/2 + 20;
+					cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, name, x.intValue(), 30, 100, 50);
 					cell.setStyle("PARENT");
 					cell.setConnectable(false);
 					codec.decode(document.getDocumentElement(), temp.getModel());	
@@ -133,12 +157,30 @@ public class Diagram extends mxGraphComponent{
 						}
 					}
 					graph.removeCells(toRemove.toArray());
+					mxGeometry g = cell.getGeometry();
+					g.setHeight(g.getHeight()+42);
+					g.setWidth(g.getWidth()+42);
+					cell.setGeometry(g);
 				} finally{
 					graph.getModel().endUpdate();
 				}
+				return cell;
 			}
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public void resizeCell(mxCell cell){
+		String name = ((State)cell.getValue()).getName();
+		Double rows = name.length()*11/cell.getGeometry().getWidth();
+		int height = (rows.intValue()+3)*11;
+		mxGeometry g = cell.getGeometry();
+		if (height < 100){
+			g.setHeight(100);
+		} else {
+			g.setHeight(height);
 		}
 	}
 

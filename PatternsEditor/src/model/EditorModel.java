@@ -1,12 +1,19 @@
 package model;
 
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
+
 import javax.swing.event.SwingPropertyChangeSupport;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+
+import com.mxgraph.model.mxCell;
+import com.mxgraph.view.mxGraph;
 
 public class EditorModel {
 	
@@ -116,9 +123,94 @@ public class EditorModel {
 		} else {
 			model.loadAdapter(name);
 		}
-		propertyChangeSupport.firePropertyChange("playDiagram", null, model);
+		if (checkDiagram(model)){
+			propertyChangeSupport.firePropertyChange("playDiagram", null, model);			
+		} else {
+			propertyChangeSupport.firePropertyChange("playDiagram", null, null);
+		}
 	}
 	
+	private boolean checkDiagram(DiagramModel model) {
+		mxCell start=null;
+		mxCell end=null;
+		Boolean endReached = false;
+		mxGraph graph = model.getCurrentAdapter().getDiagram().getGraph();
+		List<Object> cells = new ArrayList<Object>(Arrays.asList(graph.getChildCells(graph.getDefaultParent())));
+		for (int i = 0; i < cells.size(); i++){
+			mxCell current = (mxCell) cells.get(i);
+			cells.addAll(Arrays.asList(graph.getChildCells(current, true, true)));
+			if (current.getValue().equals("Start")){
+				start = current;
+				if (end != null){
+					break;
+				}
+			} else if (current.getValue().equals("End")) {
+				end = current;
+				if (start != null){
+					break;
+				}
+			}
+		}		
+		if (start == null || end == null){
+			System.out.println("No start or end");
+			return false;
+		}
+		Map<mxCell, Boolean> map = new HashMap<>();
+		Stack<mxCell> stack = new Stack<>();
+		stack.clear();
+		
+		map.put(start, true);
+		Boolean allDisabled = true;
+		for (Object edge : graph.getOutgoingEdges(start)) {
+			Edge e = (Edge)(((mxCell)edge).getValue());
+			if (!e.getDisabled()){
+				allDisabled = false;
+				stack.push((mxCell) ((mxCell)edge).getTarget());															
+			}
+		}
+		if (allDisabled){
+			System.out.println("All edges disabled");
+			return false;
+		}
+		
+		while (!stack.isEmpty()){
+			mxCell c = (mxCell) stack.pop();
+			if (map.get(c) == null){
+				map.put(c, true);
+				if (c != end){
+					List<Object> edges = new ArrayList<>(Arrays.asList(graph.getOutgoingEdges(c)));
+					if (edges.size()==0){
+						System.out.println("No edges");
+						return false;
+					} else {
+						allDisabled = true;
+						for (Object edge : edges) {
+							Edge e = (Edge)(((mxCell)edge).getValue());
+							if (!e.getDisabled()){
+								allDisabled = false;
+								if ((e.getName().isEmpty() || e.getScene().isEmpty()) && !((mxCell)edge).getTarget().equals(end)){
+									System.out.println("Empty no end edge");
+									return false;
+								} else {
+									stack.push((mxCell) ((mxCell)edge).getTarget());								
+								}
+							}
+						}
+						if (allDisabled){
+							System.out.println("All edges disabled");
+							return false;
+						}
+					}
+				} else {
+					System.out.println("End reached");
+					endReached = true;
+				}
+			}
+		}
+		System.out.println("End "+endReached);
+		return endReached;
+	}
+
 	private void initAdapterModelListeners(AdapterModel model){
 		model.addTableModelListener(new TableModelListener() {			
 			@Override
@@ -142,5 +234,19 @@ public class EditorModel {
 
 	public void setTool(int tool) {
 		this.tool = tool;
+	}
+
+	public void deleteAdapter(String pattern, String name) {
+		DiagramModel diagramModel = diagramModels.get(pattern);
+		Adapter adapter = new Adapter(pattern, name, null);
+		if (diagramModel!=null){
+			diagramModel.deleteAdapter(name);
+			if (diagramModel.getCurrentAdapter().getName().equals(name)){
+				diagramModel.changeAdapter(null);
+			}		
+			AdapterModel adapterModel = adapterModels.get(pattern);
+			adapterModel.removeRow(adapter);	
+		}
+		adapter.delete();
 	}
 }

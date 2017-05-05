@@ -23,13 +23,9 @@ public class PatternDialog extends JDialog {
 	private JTextField nameField;
 	private JTextArea descText;
 	
-	public PatternDialog(MainScreenController controller, String type, Locale locale) {
+	public PatternDialog(MainScreenController controller, Locale locale) {
 		setResizable(false);
-		if (type.equals("new")){
-			setTitle("New pattern");
-		} else {
-			setTitle("Pattern properties");
-		}
+		setTitle("Pattern properties");
 		ResourceBundle bundle = ResourceBundle.getBundle("TextBundle", locale);	
 		
 		setBounds(200, 200, 450, 300);
@@ -60,11 +56,7 @@ public class PatternDialog extends JDialog {
 		JButton btnNewButton = new JButton(bundle.getString("button.ok"));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (type.equals("new")){
-					controller.createNewPattern(nameField.getText(), descText.getText());
-				} else {
-					controller.updatePattern(nameField.getText(), descText.getText());
-				}
+				controller.createNewPattern(nameField.getText(), descText.getText());
 				PatternDialog.this.dispose();
 			}
 		});

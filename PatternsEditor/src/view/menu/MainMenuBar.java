@@ -162,7 +162,7 @@ public class MainMenuBar extends JMenuBar{
 		preferences.setText(bundle.getString("menu.preferences"));
 		
 		newPattern.setText(bundle.getString("menu.newPattern"));
-		newDiagram.setText(bundle.getString("menu.newDiagram"));
+		newDiagram.setText(bundle.getString("menu.newModel"));
 		newVersion.setText(bundle.getString("menu.newVersion"));
 		newAdapter.setText(bundle.getString("menu.newAdapter"));
 		patternOverView.setText(bundle.getString("menu.patternOverView"));

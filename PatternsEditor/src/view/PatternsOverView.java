@@ -30,6 +30,8 @@ public class PatternsOverView extends JFrame {
 	private JTextField textName;
 	private JTextArea textDescription;
 	private JTable adapterTable;
+	private JButton btnDelete;
+	private JButton btnPlayAdapters;
 	
 	public PatternsOverView() {
 		setTitle("Pattern overview");
@@ -119,7 +121,7 @@ public class PatternsOverView extends JFrame {
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		adapterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
-		JButton btnPlayAdapters = new JButton("Play");
+		btnPlayAdapters = new JButton("Play");
 		btnPlayAdapters.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -128,6 +130,16 @@ public class PatternsOverView extends JFrame {
 		});
 		btnPlayAdapters.setBounds(354, 434, 117, 25);
 		adapters.add(btnPlayAdapters);
+		
+		btnDelete = new JButton("Delete");
+		btnDelete.setBounds(12, 434, 117, 25);
+		btnDelete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.deleteAdapter((String) adapterTable.getValueAt(adapterTable.getSelectedRow(), 0));
+			}
+		});
+		adapters.add(btnDelete);
 
 	}
 
@@ -159,4 +171,12 @@ public class PatternsOverView extends JFrame {
 	public void setAdapterTable(JTable adapterTable) {
 		this.adapterTable = adapterTable;
 	}
+
+	public JButton getBtnDelete() {
+		return btnDelete;
+	}
+
+	public void setBtnDelete(JButton btnDelete) {
+		this.btnDelete = btnDelete;
+	}	
 }

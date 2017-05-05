@@ -21,6 +21,7 @@ public class Adapter implements Serializable{
 	private Boolean isNew;
 		
 	public Adapter(String pattern, String name, String xml){
+		this.isNew = false;
 		this.pattern = pattern;
 		this.diagram = new Diagram(new mxGraph(), pattern);
 		this.diagram.xmlIn(xml);
@@ -72,7 +73,7 @@ public class Adapter implements Serializable{
                 + "WHERE name = ?";	
 		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {	
 			pstmt.setString(1, diagram.getXml());
-			pstmt.setString(2, getLineName());
+			pstmt.setString(2, getName());
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println(sql);
@@ -109,6 +110,28 @@ public class Adapter implements Serializable{
 				e.printStackTrace();
 			}
         }
+	}
+	
+	public void delete() {
+		String sql = "DELETE FROM adapter WHERE pattern = ? AND name = ?";
+		Connection connection = SQLConnection.getInstance().getConnection();
+		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+			pstmt.setString(1, pattern);
+			pstmt.setString(2, getName());
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			System.out.println(sql);
+			System.out.println(e.getMessage());
+		} finally {
+			try {
+				if (connection != null){
+					connection.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public String getPattern() {

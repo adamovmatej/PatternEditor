@@ -1,7 +1,10 @@
 package view;
 
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.Timer;
+
 import controller.EditorController;
 
 public class EditorView extends JSplitPane {
@@ -11,10 +14,18 @@ public class EditorView extends JSplitPane {
 	private EditorController controller;
 	
 	private CustomTabPane map;
+	private ToolBarView toolBarView;
+	private JSplitPane rightPane;
 	
-	public EditorView(VersionPanelView versionPanelView) {		
-		map = new CustomTabPane();		
-		setRightComponent(map);
+	public EditorView(VersionPanelView versionPanelView, ToolBarView toolBarView) {
+		this.setToolBarView(toolBarView);
+		this.map = new CustomTabPane();	
+		rightPane = new JSplitPane();
+		rightPane.setOrientation(VERTICAL_SPLIT);
+		rightPane.setLeftComponent(toolBarView);
+		rightPane.setRightComponent(map);
+		rightPane.setDividerSize(0);
+		setRightComponent(rightPane);
 		setLeftComponent(versionPanelView);
 		resetDivider();
 		setDividerSize(SOMEBITS);
@@ -28,6 +39,14 @@ public class EditorView extends JSplitPane {
 		this.controller = controller;
 		map.setController(controller);
 	}
+	
+	public void showToolBar(){
+		if (rightPane.getDividerLocation()==32){
+			rightPane.setDividerLocation(1);
+		} else {
+			rightPane.setDividerLocation(32);
+		}
+	}
 
 	public CustomTabPane getMap() {
 		return map;
@@ -40,4 +59,22 @@ public class EditorView extends JSplitPane {
 	public void resetDivider(){
 		setDividerLocation(200);
 	}
+
+	public ToolBarView getToolBarView() {
+		return toolBarView;
+	}
+
+	public void setToolBarView(ToolBarView toolBarView) {
+		this.toolBarView = toolBarView;
+	}
+
+	public JSplitPane getRightPane() {
+		return rightPane;
+	}
+
+	public void setRightPane(JSplitPane rightPane) {
+		this.rightPane = rightPane;
+	}
+	
+	
 }

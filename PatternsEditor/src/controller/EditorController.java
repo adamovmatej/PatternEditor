@@ -8,12 +8,15 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.mxgraph.model.mxCell;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
 
 import controller.listener.ClickMapListener;
 import controller.listener.KeyMapListener;
 import controller.listener.MouseMotionMapListener;
 import controller.listener.MouseWheelListener;
+import controller.listener.StateConnectionListener;
 import model.Adapter;
 import model.Diagram;
 import model.DiagramModel;
@@ -34,10 +37,10 @@ public class EditorController implements PropertyChangeListener{
 	public EditorController(EditorView view, EditorModel editorModel) {
 		this.view = view;
 		this.model = editorModel;
-		((CustomTabPane)view.getRightComponent()).addChangeListener(new ChangeListener() {			
+		((CustomTabPane)view.getMap()).addChangeListener(new ChangeListener() {			
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if (((CustomTabPane)view.getRightComponent()).getTabCount()>0){
+				if (((CustomTabPane)view.getMap()).getTabCount()>0){
 					editorModel.changeDiagramModel(((Diagram) view.getMap().getComponentAt(view.getMap().getSelectedIndex())).getPattern());					
 				}
 			}
@@ -117,19 +120,31 @@ public class EditorController implements PropertyChangeListener{
 		Diagram diagram = (Diagram)view.getMap().getSelectedComponent();
 		mxGraph graph = diagram.getGraph();
 		State state = new State(name, scene, disable);
+		mxCell cell;
+		int x=0;
+		int y=0;
 		
+		Object parent = (((Diagram) (view.getMap().getSelectedComponent())).getCellAt(me.getX(), me.getY()));
+		if (parent == null){
+			parent = graph.getDefaultParent();
+		} else {
+			mxRectangle rectangle = graph.getCellBounds(parent);
+			x = new Double(rectangle.getCenterX()-rectangle.getWidth()/2).intValue();
+			y = new Double(rectangle.getCenterY()-rectangle.getHeight()/2).intValue();
+		}
 		graph.getModel().beginUpdate();
 		try{
-			mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, state, me.getX(), me.getY(), 100, 50);
+			cell = (mxCell) graph.insertVertex(parent, null, state, me.getX()-x, me.getY()-y, 150, 100);
 			if (disable){
-				cell.setStyle("fillColor=lightgray");
+				cell.setStyle("STATE_DISABLED");
 			} else {
-				cell.setStyle("fillColor=lightgreen");
+				cell.setStyle("STATE_ENABLED");
 			}
+			graph.getView().createState(cell);
 		} finally{
 			graph.getModel().endUpdate();
 		}			
-
+		diagram.resizeCell(cell);
 		graph.refresh();
 		graph.repaint();
 	}
@@ -137,21 +152,21 @@ public class EditorController implements PropertyChangeListener{
 	public void updateState(String name, String scene, Boolean disable, MouseEvent me){
 		Diagram diagram = (Diagram)view.getMap().getSelectedComponent();
 		mxGraph graph = diagram.getGraph();
-		
+		mxCell cell;
 		graph.getModel().beginUpdate();
 		try{
-			mxCell cell = (mxCell) (((Diagram) (view.getMap().getSelectedComponent())).getCellAt(me.getX(), me.getY()));
+			cell = (mxCell) (((Diagram) (view.getMap().getSelectedComponent())).getCellAt(me.getX(), me.getY()));
 			State state = (State) cell.getValue();
 			if (disable){
-				cell.setStyle("fillColor=lightgray");
+				cell.setStyle("STATE_DISABLED");
 			} else {
-				cell.setStyle("fillColor=lightgreen");
+				cell.setStyle("STATE_ENABLED");
 			}
 			state.update(name, scene, disable);
 		} finally{
 			graph.getModel().endUpdate();
 		}
-		
+		diagram.resizeCell(cell);
 		graph.refresh();
 		graph.repaint();
 	}
@@ -160,11 +175,16 @@ public class EditorController implements PropertyChangeListener{
 		Diagram diagram = (Diagram) view.getMap().getSelectedComponent();
 
 		if ((diagram.getGraph().getModel().isVertex(diagram.getCellAt(e.getX(), e.getY()))) || (diagram.getGraph().getModel().isEdge(diagram.getCellAt(e.getX(), e.getY())))){
-			if (((mxCell)diagram.getCellAt(e.getX(), e.getY())).isVertex() && ((mxCell)diagram.getCellAt(e.getX(), e.getY())).getValue().getClass().equals(String.class)){
-				RightClickCellMenu menu = new RightClickCellMenu(this, false, e);
-				menu.show(e.getComponent(), e.getX(), e.getY());
+			if (((mxCell)diagram.getCellAt(e.getX(), e.getY())).isVertex()){
+				if (((mxCell)diagram.getCellAt(e.getX(), e.getY())).getValue().getClass().equals(String.class)){
+					RightClickCellMenu menu = new RightClickCellMenu(this, false, true, e);					
+					menu.show(e.getComponent(), e.getX(), e.getY());
+				} else {
+					RightClickCellMenu menu = new RightClickCellMenu(this, false, false, e);		
+					menu.show(e.getComponent(), e.getX(), e.getY());
+				}
 			} else {
-				RightClickCellMenu menu = new RightClickCellMenu(this, true, e);
+				RightClickCellMenu menu = new RightClickCellMenu(this, true, false, e);
 				menu.show(e.getComponent(), e.getX(), e.getY());
 			}
 		} else {
@@ -185,6 +205,7 @@ public class EditorController implements PropertyChangeListener{
 	}
 	
 	private void initListeners(Diagram diagram) {
+		diagram.getConnectionHandler().addListener(mxEvent.CONNECT, new StateConnectionListener());
 		diagram.getGraphControl().addMouseListener(new ClickMapListener(this));
 		diagram.addKeyListener(new KeyMapListener(this));
 		diagram.addMouseWheelListener(new MouseWheelListener(diagram));
@@ -236,7 +257,7 @@ public class EditorController implements PropertyChangeListener{
 		graph.getModel().beginUpdate();
 		try{
 			mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "Start", me.getX(), me.getY(), 35, 35);
-			cell.setStyle("CIRCLE;fillColor=black");
+			cell.setStyle("CIRCLE");
 		} finally{
 			graph.getModel().endUpdate();
 		}			
@@ -252,7 +273,7 @@ public class EditorController implements PropertyChangeListener{
 		graph.getModel().beginUpdate();
 		try{
 			mxCell cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "End", me.getX(), me.getY(), 35, 35);
-			cell.setStyle("CIRCLE;fillColor=black");
+			cell.setStyle("CIRCLE");
 		} finally{
 			graph.getModel().endUpdate();
 		}			
@@ -291,12 +312,12 @@ public class EditorController implements PropertyChangeListener{
 						}
 					} else if (!(cell.getValue().getClass().equals(String.class))) {
 						State node = (State) cell.getValue();
-						if (cell.getStyle().equals("fillColor=lightgreen")){
+						if (cell.getStyle().equals("STATE_ENABLED")){
 							node.setDisabled(true);
-							cell.setStyle("fillColor=lightgray");
-						} else if (cell.getStyle().equals("fillColor=lightgray")){
+							cell.setStyle("STATE_DISABLED");
+						} else if (cell.getStyle().equals("STATE_DISABLED")){
 							node.setDisabled(false);
-							cell.setStyle("fillColor=lightgreen");
+							cell.setStyle("STATE_ENABLED");
 						}						
 					}
 				}
@@ -308,14 +329,17 @@ public class EditorController implements PropertyChangeListener{
 			graph.repaint();
 			break;
 		case 2:
+			view.getToolBarView().checkToolBarButtons(0);
 			createStateDialog(me);
 			model.setTool(0);
 			break;
 		case 3:
+			view.getToolBarView().checkToolBarButtons(0);
 			createStart(me);
 			model.setTool(0);
 			break;
 		case 4:
+			view.getToolBarView().checkToolBarButtons(0);
 			createEnd(me);
 			model.setTool(0);
 			break;
@@ -328,5 +352,9 @@ public class EditorController implements PropertyChangeListener{
 		while (view.getMap().getSelectedIndex()>-1){
 			removeTab();
 		}
+	}
+
+	public void showToolBar() {
+		view.showToolBar();		
 	}
 }

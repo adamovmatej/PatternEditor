@@ -33,7 +33,7 @@ public class Main {
 		MainMenuBar mainMenuBar = new MainMenuBar();
 		ToolBarView toolBar = new ToolBarView();
 		VersionPanelView versionPanelView = new VersionPanelView();
-		EditorView editorView = new EditorView(versionPanelView);
+		EditorView editorView = new EditorView(versionPanelView, toolBar);
 		MainScreen mainScreen = new MainScreen(mainMenuBar, editorView);
 		
 		PatternModel patternModel = new PatternModel();

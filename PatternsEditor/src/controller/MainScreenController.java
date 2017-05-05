@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
 import model.DiagramModel;
@@ -68,11 +69,15 @@ public class MainScreenController implements PropertyChangeListener{
 	}
 	
 	public void openDiagram(String pattern){
-		editorModel.open(pattern);
+		if (editorModel.getDiagramModels().get(pattern)!=null){
+			JOptionPane.showMessageDialog(view, "Model for this organizational pattern is alread openned.");
+		} else {
+			editorModel.open(pattern);
+		}
 	}
 	
 	public void createNewPatternDialog() {
-		PatternDialog dialog = new PatternDialog(this, "new", currentLocale);
+		PatternDialog dialog = new PatternDialog(this, currentLocale);
 		dialog.setVisible(true);
 	}
 
@@ -87,11 +92,6 @@ public class MainScreenController implements PropertyChangeListener{
 
 	public void createNewPattern(String name, String desc) {
 		patternModel.createPattern(name, desc);
-	}
-
-	public void updatePattern(String name, String desc) {
-		// TODO Auto-generated method stub
-				
 	}
 
 	public void showPatternOverview() {
@@ -126,11 +126,14 @@ public class MainScreenController implements PropertyChangeListener{
 		editorModel.save();
 	}
 
-	public void showToolbar() {
-		this.toolBar.setVisible(true);
-	}
-
 	public void removeTab() {
+		int result = JOptionPane.showConfirmDialog(view, "Do you want to save before closing?");
+		if (result == JOptionPane.CANCEL_OPTION){
+			return;
+		}
+		if (result == JOptionPane.OK_OPTION){
+			saveDiagram();
+		}
 		editorController.removeTab();
 	}
 
@@ -139,10 +142,28 @@ public class MainScreenController implements PropertyChangeListener{
 	}
 
 	public void exit() {
+		int result = JOptionPane.showConfirmDialog(view, "Do you want to save before exit?");
+		if (result == JOptionPane.CANCEL_OPTION){
+			return;
+		}
+		if (result == JOptionPane.OK_OPTION){
+			saveAll();
+		}
 		view.dispose();
 	}
 
 	public void removeAllTabs() {
+		int result = JOptionPane.showConfirmDialog(view, "Do you want to save before closing?");
+		if (result == JOptionPane.CANCEL_OPTION){
+			return;
+		}
+		if (result == JOptionPane.OK_OPTION){
+			saveAll();
+		}
 		editorController.removeAllTabs();
+	}
+
+	public void showToolbar() {
+		editorController.showToolBar();
 	}
 }

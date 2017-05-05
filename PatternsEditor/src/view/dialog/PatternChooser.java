@@ -80,7 +80,7 @@ public class PatternChooser extends JDialog {
 		
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		if (type.equals("diagram")){
-			setTitle(bundle.getString("title.newDiagram"));
+			setTitle(bundle.getString("title.newModel"));
 		} else if (type.equals("adapter")){
 			table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 			setTitle(bundle.getString("title.addAdapter"));

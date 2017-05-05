@@ -52,7 +52,7 @@ public class PlayController {
 		} else{
 			DefaultTableModel tableModel = new DefaultTableModel(new Object[]{""}, 0);
 			State state = (State) cell.getValue();
-			view.getTextArea().setText(state.getScene());
+			view.getTextPane().setText(state.getScene());
 			mxCell edge;
 			Edge value;
 			for (Object c : diagram.getGraph().getOutgoingEdges(cell)) {

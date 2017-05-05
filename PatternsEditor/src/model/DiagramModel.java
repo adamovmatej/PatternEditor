@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 import com.mxgraph.model.mxCell;
+import com.mxgraph.model.mxGeometry;
 import com.mxgraph.view.mxGraph;
 
 import model.db.SQLConnection;
@@ -50,45 +51,45 @@ public class DiagramModel {
 		mxCell cell;
 		graph.getModel().beginUpdate();
 		try{
-			cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "Default", 30, 30, 100, 50);
+			cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "Default", 30, 30, 0, 0);
 			cell.setStyle("PARENT");
 			cell.setConnectable(false);
 			graph.addCells(def.cloneCells(def.getChildCells(def.getDefaultParent())), cell);
+			mxGeometry g = cell.getGeometry();
+			g.setHeight(g.getHeight()+42);
+			g.setWidth(g.getWidth()+42);
+			cell.setGeometry(g);
 		} finally{
 			graph.getModel().endUpdate();
 		}
-		getDefaulDiagrams(patterns, diagram);
+		getDefaulDiagrams(patterns, diagram, cell);
 		currentAdapter = new Adapter(pattern, patterns, diagram);
 		adapters.put(currentAdapter.getLineName(), currentAdapter);
 	}
 	
-	private void getDefaulDiagrams(List<String> patterns,  Diagram diagram){
-		String list = "";
+	private void getDefaulDiagrams(List<String> patterns,  Diagram diagram, mxCell cell){
+		mxCell lastCell = cell;
 		for (String pattern : patterns) {
-			if (!getDefaulDiagram(pattern, diagram)){
-				list+=pattern+", ";
+			mxCell c = getDefaulDiagram(pattern, diagram, lastCell);
+			if (c != null){
+				lastCell = c;
 			}
-		}
-		if (!list.isEmpty()){
-			JOptionPane.showMessageDialog(diagram, "Patterns: "+list.substring(0, list.length()-2)+" dont have default diagrams!");			
 		}
 	}
 	
-	private boolean getDefaulDiagram(String name, Diagram diagram){
-		Boolean result = true;
+	private mxCell getDefaulDiagram(String name, Diagram diagram, mxCell cell){
 		Connection connection = SQLConnection.getInstance().getConnection();
 		String sql = "SELECT xml "
 				+ "FROM pattern "
                 + "WHERE name = ?";	
+		mxCell c = null;
 		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {	
 			pstmt.setString(1, name);
+			
 			ResultSet rs = pstmt.executeQuery();
 			if (rs.next()){
 				String xml = rs.getString("xml");
-				diagram.xmlCloneIn(xml, name);
-				if (xml==null){
-					result = false;
-				}
+				c = diagram.xmlCloneIn(xml, name, cell);
 			}
 		} catch (SQLException e) {
 			System.out.println(sql);
@@ -102,7 +103,7 @@ public class DiagramModel {
 				e.printStackTrace();
 			}
 		}
-		return result;
+		return c;
 	}
 	
 	public void saveDefault() {		
@@ -216,13 +217,21 @@ public class DiagramModel {
 		}
 	}
 
-	public void addListener(PropertyChangeListener prop){
-		propertyChangeSupport.addPropertyChangeListener(prop);
+	public void changeAdapter(String adapter) {
+		if (adapter == null){
+			adapter = "<html>Default</html>";
+		}
+		System.out.println(adapter);
+		currentAdapter = adapters.get(adapter);
+		propertyChangeSupport.firePropertyChange("adapterChange", null, currentAdapter.getDiagram());
 	}
 	
-	public void removeVersion(String pattern, int selection) {	
-		//TODO
-		//VariationModel varModel = getVariationModel(pattern);
+	public void deleteAdapter(String adapter) {
+		adapters.remove(adapter);
+	}
+	
+	public void addListener(PropertyChangeListener prop){
+		propertyChangeSupport.addPropertyChangeListener(prop);
 	}
 
 	public String getPattern() {
@@ -253,12 +262,4 @@ public class DiagramModel {
 		this.adapters = adapters;
 	}
 
-	public void changeAdapter(String adapter) {
-		if (adapter == null){
-			adapter = "<html>Default</html>";
-		}
-		System.out.println(adapter);
-		currentAdapter = adapters.get(adapter);
-		propertyChangeSupport.firePropertyChange("adapterChange", null, currentAdapter.getDiagram());
-	}
 }

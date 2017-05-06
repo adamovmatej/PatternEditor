@@ -11,9 +11,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
-import model.DiagramModel;
-import model.EditorModel;
 import model.PatternModel;
+import model.EditorModel;
+import model.Pattern;
 import view.MainScreen;
 import view.ToolBarView;
 import view.dialog.PatternChooser;
@@ -27,13 +27,13 @@ public class MainScreenController implements PropertyChangeListener{
 	private MainScreen view;
 	private MainMenuBar bar;
 	private EditorModel editorModel;
-	private PatternModel patternModel;
+	private Pattern patternModel;
 	private PatternOverviewController oveviewController;
 	private EditorController editorController;
 	private ToolBarView toolBar;
 	
 	
-	public MainScreenController(MainScreen mainScreen, MainMenuBar bar, EditorModel editorModel, PatternModel patternModel, PatternOverviewController patternOverviewController, EditorController editorController, ToolBarView toolBar) {
+	public MainScreenController(MainScreen mainScreen, MainMenuBar bar, EditorModel editorModel, Pattern patternModel, PatternOverviewController patternOverviewController, EditorController editorController, ToolBarView toolBar) {
 		setCurrentLocale(Locale.ENGLISH);
 		
 		editorModel.addListener(this);

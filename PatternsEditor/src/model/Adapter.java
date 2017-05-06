@@ -10,6 +10,8 @@ import java.util.List;
 
 import com.mxgraph.view.mxGraph;
 
+import model.db.AdapterDAO;
+import model.db.DAOFactory;
 import model.db.SQLConnection;
 
 public class Adapter implements Serializable{
@@ -65,73 +67,6 @@ public class Adapter implements Serializable{
 	public List<String> getPatternList(String name){
 		List<String> items = Arrays.asList(name.split("\\s*/\\s*"));
 		return new ArrayList<>(items);
-	}
-	
-	public void save(){
-		Connection connection = SQLConnection.getInstance().getConnection();
-		String sql = "UPDATE adapter SET xml = ? "
-                + "WHERE name = ?";	
-		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {	
-			pstmt.setString(1, diagram.getXml());
-			pstmt.setString(2, getName());
-			pstmt.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println(sql);
-        	System.out.println(e.getMessage());
-		} finally {
-			try {
-				if (connection != null){
-					connection.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}	
-	}
-	
-	public void insert(){
-		String sql = "INSERT INTO adapter(name,pattern,xml) VALUES(?,?,?)";
-		Connection connection = SQLConnection.getInstance().getConnection();
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, getName());
-            pstmt.setString(2, pattern);
-            pstmt.setString(3, diagram.getXml());
-            pstmt.executeUpdate();
-            setIsNew(false);
-        } catch (SQLException e) {
-        	System.out.println(sql);
-            System.out.println(e.getMessage());
-        } finally {
-        	try {
-        		if (connection != null){
-        			connection.close();
-        		}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-        }
-	}
-	
-	public void delete() {
-		String sql = "DELETE FROM adapter WHERE pattern = ? AND name = ?";
-		Connection connection = SQLConnection.getInstance().getConnection();
-		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-			pstmt.setString(1, pattern);
-			pstmt.setString(2, getName());
-			pstmt.executeUpdate();
-			
-		} catch (SQLException e) {
-			System.out.println(sql);
-			System.out.println(e.getMessage());
-		} finally {
-			try {
-				if (connection != null){
-					connection.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public String getPattern() {

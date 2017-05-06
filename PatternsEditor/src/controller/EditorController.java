@@ -19,7 +19,7 @@ import controller.listener.MouseWheelListener;
 import controller.listener.StateConnectionListener;
 import model.Adapter;
 import model.Diagram;
-import model.DiagramModel;
+import model.PatternModel;
 import model.Edge;
 import model.EditorModel;
 import model.State;
@@ -51,7 +51,7 @@ public class EditorController implements PropertyChangeListener{
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("newDiagramModel")){
-			DiagramModel diagramModel = (DiagramModel)evt.getNewValue();
+			PatternModel diagramModel = (PatternModel)evt.getNewValue();
 			diagramModel.addListener(this);
 			initListenersDiagramModel(diagramModel);
 			Diagram diagram = diagramModel.getCurrentAdapter().getDiagram();
@@ -202,7 +202,7 @@ public class EditorController implements PropertyChangeListener{
 		view.getMap().setSelectedComponent(diagram);
 	}
 		
-	private void initListenersDiagramModel(DiagramModel diagramModel){
+	private void initListenersDiagramModel(PatternModel diagramModel){
 		for (String key : diagramModel.getAdapters().keySet()){
 			initListeners(diagramModel.getAdapters().get(key).getDiagram());
 		}

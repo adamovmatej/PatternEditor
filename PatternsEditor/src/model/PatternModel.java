@@ -5,238 +5,163 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
 import javax.swing.event.SwingPropertyChangeSupport;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
+import com.mxgraph.model.mxCell;
+import com.mxgraph.model.mxGeometry;
+import com.mxgraph.view.mxGraph;
+
+import model.db.AdapterDAO;
+import model.db.DAOFactory;
+import model.db.PatternDAO;
 import model.db.SQLConnection;
 
 public class PatternModel {
 	
-	private SwingPropertyChangeSupport propertyChangeSupport;
+	private SwingPropertyChangeSupport propertyChangeSupport;	
+	private Map<String, Adapter> adapters;	
+	private Adapter currentAdapter;
+	private String pattern;
+	private PatternDAO patternDAO;
+	private AdapterDAO adapterDAO;
 	
-	private List<String> patterns;
 	
-	public PatternModel(){
-		propertyChangeSupport = new SwingPropertyChangeSupport(this);
-		this.patterns = dbGetAllPatterns();
+	public PatternModel(){		
 	}
 	
-	public void createPattern(String name, String description){
-		if (patterns.contains(name)){
-			propertyChangeSupport.firePropertyChange("newPattern", null, null);
-		} else {
-			patterns.add(name);
-			dbInsert(name, description);			
+	public PatternModel(String pattern) {
+		this.patternDAO = DAOFactory.getInstance().getPatternDAO();
+		this.adapterDAO = DAOFactory.getInstance().getAdapterDAO();
+		this.setPattern(pattern);
+		propertyChangeSupport = new SwingPropertyChangeSupport(this);
+		List<String> list = new ArrayList<>();
+		list.add("Default");
+		currentAdapter = new Adapter(pattern, list);
+		adapters = new HashMap<String, Adapter>();
+		adapters.put(currentAdapter.getLineName(), currentAdapter);
+	}
+	
+	public void load(String name){
+		loadDefault();
+		loadAdapters();
+	}
+
+	public void createAdapter(Adapter adapter){
+		mxGraph graph = new mxGraph();
+		Diagram diagram = new Diagram(graph, pattern);
+		mxGraph def = adapters.get("<html>Default</html>").getDiagram().getGraph();
+		mxCell cell;
+		graph.getModel().beginUpdate();
+		try{
+			cell = (mxCell) graph.insertVertex(graph.getDefaultParent(), null, "Default", 30, 30, 0, 0);
+			cell.setStyle("PARENT");
+			cell.setConnectable(false);
+			graph.addCells(def.cloneCells(def.getChildCells(def.getDefaultParent())), cell);
+			mxGeometry g = cell.getGeometry();
+			g.setHeight(g.getHeight()+42);
+			g.setWidth(g.getWidth()+42);
+			cell.setGeometry(g);
+		} finally{
+			graph.getModel().endUpdate();
+		}
+		getDefaulDiagrams(adapter.getPatterns(), diagram, cell);
+		adapter.setDiagram(diagram);
+		currentAdapter = adapter;
+		adapters.put(currentAdapter.getLineName(), currentAdapter);
+	}
+	
+	private void getDefaulDiagrams(List<String> patterns,  Diagram diagram, mxCell cell){
+		mxCell lastCell = cell;
+		for (String pattern : patterns) {
+			mxCell c = patternDAO.dbGetDefaulDiagram(pattern, diagram, lastCell);
+			if (c != null){
+				lastCell = c;
+			}
+		}
+	}
+	
+	public void saveDefault() {		
+		patternDAO.dbSaveDefault(adapters.get("<html>Default</html>").getDiagram().getXml(), pattern);		
+	}
+	
+	public void loadDefault(){
+		currentAdapter.getDiagram().xmlIn(patternDAO.dbLoadDefault(pattern));
+	}	
+
+	private void loadAdapters() {
+        adapters = patternDAO.dbLoadAdapters(pattern);
+	}
+	
+	public void loadAdapter(String name){
+        currentAdapter = new Adapter(pattern, name, patternDAO.dbLoadAdapter(pattern, name));
+	}
+	
+	public void saveAll() {
+		saveDefault();
+		Adapter adapter;
+		for (String key : adapters.keySet()) {
+			adapter = adapters.get(key);
+			if (!key.equals("<html>Default</html>")){
+				if (adapter.getIsNew()){
+					adapterDAO.dbInsert(adapter.getName(), adapter.getPattern(), adapter.getDiagram().getXml());
+					adapter.setIsNew(false);
+				} else {
+					adapterDAO.dbSave(adapter.getName(), adapter.getPattern(), adapter.getDiagram().getXml());			
+				}
+			}
 		}
 	}
 
-	public List<String> getPatterns() {
-		return patterns;
-	}
-
-	public void setPatterns(List<String> patterns) {
-		this.patterns = patterns;
+	public void changeAdapter(String adapter) {
+		if (adapter == null){
+			adapter = "<html>Default</html>";
+		}
+		System.out.println(adapter);
+		currentAdapter = adapters.get(adapter);
+		propertyChangeSupport.firePropertyChange("adapterChange", null, currentAdapter.getDiagram());
 	}
 	
-	public void addListener(PropertyChangeListener prop) {
+	public void deleteAdapter(String adapter) {
+		adapters.remove(adapter);
+	}
+	
+	public void addListener(PropertyChangeListener prop){
 		propertyChangeSupport.addPropertyChangeListener(prop);
-    }
-	
-	private List<String> dbGetAllPatterns(){
-		List<String> list = new ArrayList<String>();
-		String sql = "SELECT name FROM pattern";
-		try (Connection connection = SQLConnection.getInstance().getConnection(); 
-				Statement stmt  = connection.createStatement();
-	            ResultSet rs    = stmt.executeQuery(sql)){
-	            
-	            while (rs.next()) {
-	            	list.add(rs.getString("name"));
-	            }
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-	    }
-		return list;
-	}
-	
-	private void dbInsert(String name, String description){
-		String sql = "INSERT INTO pattern(name,description) VALUES(?,?)";
-		Connection connection = SQLConnection.getInstance().getConnection();
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, name);
-            pstmt.setString(2, description);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-        	System.out.println(sql);
-            System.out.println(e.getMessage());
-        } finally {
-        	try {
-        		if (connection != null){
-        			connection.close();
-        		}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-        }
 	}
 
-	public Pattern dbGetPattern(String name) {
-		String sql = "SELECT name, description FROM pattern WHERE name = ?";
-		Connection connection = SQLConnection.getInstance().getConnection();
-		Pattern pattern = null;
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, name);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()){
-            	pattern = new Pattern(rs.getString("name"), rs.getString("description"));
-            }
-        } catch (SQLException e) {
-        	System.out.println(sql);
-            System.out.println(e.getMessage());
-        } finally {
-        	try {
-        		if (connection != null){
-        			connection.close();
-        		}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-        }
+	public String getPattern() {
 		return pattern;
 	}
-	
-	public List<String> dbGetNoModelPatterns() {
-		String sql = "SELECT name FROM pattern WHERE xml IS NULL";
-		Connection connection = SQLConnection.getInstance().getConnection();
-		List<String> patterns = new ArrayList<>();
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()){
-            	patterns.add(rs.getString("name"));
-            }
-        } catch (SQLException e) {
-        	System.out.println(sql);
-            System.out.println(e.getMessage());
-        } finally {
-        	try {
-        		if (connection != null){
-        			connection.close();
-        		}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-        }
-		return patterns;
-	}
-	
-	public List<String> dbGetWithModelPatterns() {
-		String sql = "SELECT name FROM pattern WHERE xml IS NOT NULL";
-		Connection connection = SQLConnection.getInstance().getConnection();
-		List<String> patterns = new ArrayList<>();
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()){
-            	patterns.add(rs.getString("name"));
-            }
-        } catch (SQLException e) {
-        	System.out.println(sql);
-            System.out.println(e.getMessage());
-        } finally {
-        	try {
-        		if (connection != null){
-        			connection.close();
-        		}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-        }
-		return patterns;
+
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
 	}
 
-	public void updatePattern(String name, String description) {
-		dbUpdatePattern(name, description);
-	}
-	
-	private void dbUpdatePattern(String name, String description){
-		String sql = "UPDATE pattern SET description = ? "
-	                + "WHERE name = ?";
-		Connection connection = SQLConnection.getInstance().getConnection();
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, description);
-            pstmt.setString(2, name);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-        	System.out.println(sql);
-            System.out.println(e.getMessage());
-        } finally {
-        	try {
-        		if (connection != null){
-        			connection.close();
-        		}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-        }
-        propertyChangeSupport.firePropertyChange("patternUpdate", name, new Pattern(name, description));
-	}
-	
-	public void dbDelete(String name) {
-		patterns.remove(patterns.indexOf(name));
-		String sql = "DELETE FROM pattern WHERE name = ?";
-		Connection connection = SQLConnection.getInstance().getConnection();
-		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-			pstmt.setString(1, name);
-			pstmt.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println(sql);
-			System.out.println(e.getMessage());
-		} finally {
-			try {
-				if (connection != null){
-					connection.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public DefaultTableModel generateTableModel(){
-		DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Organizacne vzory"}, 0);
-		for (String string : patterns) {
-			tableModel.addRow(new Object[]{string});
-		}
-		return tableModel;
+	public Adapter getCurrentAdapter() {
+		return currentAdapter;
+	}	
+
+	public Adapter getAdapter(String key) {
+		return adapters.get(key);
 	}
 
-	public TableModel generateNewModelTableModel() {
-		DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Organizacne vzory"}, 0);
-		for (String string : dbGetNoModelPatterns()) {
-			tableModel.addRow(new Object[]{string});
-		}
-		return tableModel;
+	public void setCurrentAdapter(Adapter currentAdapter) {
+		this.currentAdapter = currentAdapter;
 	}
 
-	public TableModel generatOpenTableModel() {
-		DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Organizacne vzory"}, 0);
-		for (String string : dbGetWithModelPatterns()) {
-			tableModel.addRow(new Object[]{string});
-		}
-		return tableModel;
+	public Map<String, Adapter> getAdapters() {
+		return adapters;
 	}
 
-	public TableModel generatNewAdapterTableModel(String pattern) {
-		DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Organizacne vzory"}, 0);
-		for (String string : patterns) {
-			if (!string.equals(pattern)){
-				tableModel.addRow(new Object[]{string});				
-			}
-		}
-		return tableModel;
+	public void setAdapters(Map<String, Adapter> adapters) {
+		this.adapters = adapters;
 	}
+
 }

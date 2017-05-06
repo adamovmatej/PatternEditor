@@ -15,25 +15,30 @@ import javax.swing.event.TableModelListener;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.view.mxGraph;
 
+import model.db.AdapterDAO;
+import model.db.DAOFactory;
+
 public class EditorModel {
 	
 	private SwingPropertyChangeSupport propertyChangeSupport;
-	private Map<String, DiagramModel> diagramModels;
+	private Map<String, PatternModel> patternModels;
 	private Map<String, AdapterModel> adapterModels;
-	private DiagramModel currentDiagramModel;
+	private PatternModel currentDiagramModel;
 	private AdapterModel currentAdapterModel;
+	private AdapterDAO adapterDAO;
 	private int tool;
 	
 	public EditorModel() {
 		tool = 0;
-		diagramModels = new HashMap<String, DiagramModel>();
+		adapterDAO = DAOFactory.getInstance().getAdapterDAO();
+		patternModels = new HashMap<String, PatternModel>();
 		adapterModels = new HashMap<String, AdapterModel>();
 		propertyChangeSupport = new SwingPropertyChangeSupport(this);
 	}
 	
 	public void createDiagramModel(String name){
-		currentDiagramModel = new DiagramModel(name);
-		diagramModels.put(name, currentDiagramModel);
+		currentDiagramModel = new PatternModel(name);
+		patternModels.put(name, currentDiagramModel);
 		currentAdapterModel = new AdapterModel();
 		initAdapterModelListeners(currentAdapterModel);
 		currentAdapterModel.initTables(currentDiagramModel);
@@ -44,7 +49,7 @@ public class EditorModel {
 	public void changeDiagramModel(String name) {
 		if (!currentDiagramModel.getCurrentAdapter().getPattern().equals(name)){
 			currentAdapterModel = adapterModels.get(name);
-			currentDiagramModel = diagramModels.get(name);
+			currentDiagramModel = patternModels.get(name);
 			propertyChangeSupport.firePropertyChange("diagramModelChange", currentAdapterModel, currentDiagramModel);			
 		}
 	}
@@ -61,7 +66,7 @@ public class EditorModel {
 	}
 
 	public void closeDiagramModel(String pattern) {
-		diagramModels.remove(pattern);
+		patternModels.remove(pattern);
 		adapterModels.remove(pattern);
 	}
 	
@@ -81,19 +86,19 @@ public class EditorModel {
 		return adapterModels.get(pattern);
 	}
 	
-	public Map<String, DiagramModel> getDiagramModels() {
-		return diagramModels;
+	public Map<String, PatternModel> getDiagramModels() {
+		return patternModels;
 	}
 
-	public void setDiagramModels(Map<String, DiagramModel> diagramModels) {
-		this.diagramModels = diagramModels;
+	public void setDiagramModels(Map<String, PatternModel> diagramModels) {
+		this.patternModels = diagramModels;
 	}
 
-	public DiagramModel getCurrentDiagramModel() {
+	public PatternModel getCurrentDiagramModel() {
 		return currentDiagramModel;
 	}
 
-	public void setCurrentDiagramModel(DiagramModel currentDiagramModel) {
+	public void setCurrentDiagramModel(PatternModel currentDiagramModel) {
 		this.currentDiagramModel = currentDiagramModel;
 	}
 
@@ -110,9 +115,9 @@ public class EditorModel {
 	}
 	
 	public void open(String name) {
-		currentDiagramModel = new DiagramModel(name);
+		currentDiagramModel = new PatternModel(name);
 		currentDiagramModel.load(name);
-		diagramModels.put(name, currentDiagramModel);
+		patternModels.put(name, currentDiagramModel);
 		currentAdapterModel = new AdapterModel();
 		initAdapterModelListeners(currentAdapterModel);
 		currentAdapterModel.initTables(currentDiagramModel);
@@ -121,7 +126,7 @@ public class EditorModel {
 	}
 	
 	public void loadDiagram(String pattern, String name){
-		DiagramModel model = new DiagramModel(pattern);
+		PatternModel model = new PatternModel(pattern);
 		model.setPattern(pattern);
 		if (name.equals("Default")){
 			model.loadDefault();
@@ -135,7 +140,7 @@ public class EditorModel {
 		}
 	}
 	
-	private boolean checkDiagram(DiagramModel model) {
+	private boolean checkDiagram(PatternModel model) {
 		mxCell start=null;
 		mxCell end=null;
 		Boolean endReached = false;
@@ -232,8 +237,8 @@ public class EditorModel {
 	}
 
 	public void saveAll() {
-		for (String key: diagramModels.keySet()) {
-			diagramModels.get(key).saveAll();
+		for (String key: patternModels.keySet()) {
+			patternModels.get(key).saveAll();
 		}
 	}
 
@@ -246,16 +251,16 @@ public class EditorModel {
 	}
 
 	public void deleteAdapter(String pattern, String name) {
-		DiagramModel diagramModel = diagramModels.get(pattern);
+		PatternModel patternModel = patternModels.get(pattern);
 		Adapter adapter = new Adapter(pattern, name, null);
-		if (diagramModel!=null){
-			diagramModel.deleteAdapter(name);
-			if (diagramModel.getCurrentAdapter().getName().equals(name)){
-				diagramModel.changeAdapter(null);
+		if (patternModel!=null){
+			patternModel.deleteAdapter(name);
+			if (patternModel.getCurrentAdapter().getName().equals(name)){
+				patternModel.changeAdapter(null);
 			}		
 			AdapterModel adapterModel = adapterModels.get(pattern);
 			adapterModel.removeRow(adapter);	
 		}
-		adapter.delete();
+		adapterDAO.dbDelete(adapter.getPattern(), adapter.getName());
 	}
 }

@@ -12,10 +12,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.TableView.TableRow;
 
 import model.Diagram;
-import model.DiagramModel;
+import model.PatternModel;
 import model.EditorModel;
-import model.Variation;
-import model.Version;
 import model.Adapter;
 import model.AdapterModel;
 import view.VersionPanelView;
@@ -35,7 +33,7 @@ public class VersionPanelController implements PropertyChangeListener{
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("newDiagramModel") || evt.getPropertyName().equals("diagramModelChange")){
-			DiagramModel diagramModel = (DiagramModel) evt.getNewValue();
+			PatternModel diagramModel = (PatternModel) evt.getNewValue();
 			AdapterModel adapterModel = (AdapterModel) evt.getOldValue();
 			if (adapterModel != null){
 				view.getAdapterTable().setModel(adapterModel);

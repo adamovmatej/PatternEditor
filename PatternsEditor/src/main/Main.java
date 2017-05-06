@@ -9,10 +9,10 @@ import controller.PatternOverviewController;
 import controller.PlayController;
 import controller.VersionPanelController;
 import model.CellNode;
-import model.DiagramModel;
+import model.PatternModel;
 import model.Edge;
 import model.EditorModel;
-import model.PatternModel;
+import model.Pattern;
 import model.State;
 import model.db.SQLConnection;
 import view.EditorView;
@@ -36,7 +36,7 @@ public class Main {
 		EditorView editorView = new EditorView(versionPanelView, toolBar);
 		MainScreen mainScreen = new MainScreen(mainMenuBar, editorView);
 		
-		PatternModel patternModel = new PatternModel();
+		Pattern patternModel = new Pattern();
 		EditorModel editorModel = new EditorModel();
 		
 		PlayController playController = new PlayController();

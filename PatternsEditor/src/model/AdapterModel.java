@@ -20,7 +20,7 @@ public class AdapterModel extends DefaultTableModel{
 		super(new Object[]{"Adapters:"},0);		
 	}
 	
-	public void initTables(DiagramModel model) {
+	public void initTables(PatternModel model) {
 		Map<String, Adapter> adapterMap = model.getAdapters();
 		this.addRow(new Object[]{model.getAdapter("<html>Default</html>").getLineName()});
 		for (String key : adapterMap.keySet()) {
@@ -67,15 +67,6 @@ public class AdapterModel extends DefaultTableModel{
 	
 	public void addAdapter(String name){
 		this.addRow(new Object[]{name});
-	}
-	
-	private String getLineName(String name){
-		String result="<html>";
-		List<String> items = Arrays.asList(name.split("\\s*/\\s*"));
-		for (String string : items) {
-			result += string + "<br>";
-		}
-		return result.substring(0, result.length()-4)+"</html>";
 	}
 
 	public void removeRow(Adapter adapter) {

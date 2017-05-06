@@ -9,10 +9,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-import model.DiagramModel;
-import model.EditorModel;
-import model.Pattern;
 import model.PatternModel;
+import model.EditorModel;
+import model.PatternObject;
+import model.Pattern;
 import model.AdapterModel;
 import model.Diagram;
 import view.PatternsOverView;
@@ -21,13 +21,13 @@ public class PatternOverviewController implements PropertyChangeListener{
 	
 	private PatternsOverView overview = null;
 	private PlayController playController;
-	private PatternModel patternModel;
+	private Pattern patternModel;
 	private EditorModel editorModel;
 	private MainScreenController mainController;
 	
 	private String currentPattern;
 	
-	public PatternOverviewController(PatternModel patternModel, EditorModel editorModel, PlayController playController) {
+	public PatternOverviewController(Pattern patternModel, EditorModel editorModel, PlayController playController) {
 		this.playController = playController;
 		this.patternModel = patternModel;
 		this.editorModel = editorModel;
@@ -102,7 +102,7 @@ public class PatternOverviewController implements PropertyChangeListener{
 	}
 	
 	private void initPatternInformation(String name){
-		Pattern pattern = patternModel.dbGetPattern(name);
+		PatternObject pattern = patternModel.getPattern(name);
 		populateAdapterTable(name);
 		overview.showOverview(pattern.getName(), pattern.getDescription());
 	}
@@ -114,7 +114,7 @@ public class PatternOverviewController implements PropertyChangeListener{
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		if (evt.getPropertyName().equals("playDiagram")){
-			DiagramModel model = (DiagramModel)evt.getNewValue();
+			PatternModel model = (PatternModel)evt.getNewValue();
 			if (model == null){
 				JOptionPane.showMessageDialog(overview, "The adapter you chose is not valid.\nIt cannot be played.");
 			} else {
@@ -139,7 +139,7 @@ public class PatternOverviewController implements PropertyChangeListener{
 		int result = JOptionPane.showConfirmDialog(overview, "You are about to delete "+currentPattern+".\nAre you sure?");
 		if (result == JOptionPane.OK_OPTION){
 			((DefaultTableModel)overview.getTable().getModel()).removeRow(overview.getTable().getSelectedRow());
-			patternModel.dbDelete(currentPattern);
+			patternModel.deletePattern(currentPattern);
 			mainController.removeTab(currentPattern);
 		}
 	}

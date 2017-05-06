@@ -23,6 +23,7 @@ public class PatternOverviewController implements PropertyChangeListener{
 	private PlayController playController;
 	private PatternModel patternModel;
 	private EditorModel editorModel;
+	private MainScreenController mainController;
 	
 	private String currentPattern;
 	
@@ -106,17 +107,12 @@ public class PatternOverviewController implements PropertyChangeListener{
 		overview.showOverview(pattern.getName(), pattern.getDescription());
 	}
 
-	public void saveOverview(String name, String description) {
-		patternModel.updatePattern(currentPattern, name, description);
+	public void saveOverview(String description) {
+		patternModel.updatePattern(currentPattern, description);
 	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("patternUpdate")){
-			Pattern pattern = (Pattern) evt.getNewValue();
-			updateTable((String) evt.getOldValue(), pattern.getName());
-			return;
-		}
 		if (evt.getPropertyName().equals("playDiagram")){
 			DiagramModel model = (DiagramModel)evt.getNewValue();
 			if (model == null){
@@ -130,18 +126,6 @@ public class PatternOverviewController implements PropertyChangeListener{
 		}
 	}
 	
-	private void updateTable(String oldName, String newName){
-		for (int i = 0; i < overview.getTable().getModel().getRowCount(); i++) {
-			if (overview.getTable().getValueAt(i, 0).equals(oldName)){
-				if (currentPattern.equals(oldName)){
-					currentPattern = newName;
-				}
-				overview.getTable().setValueAt(newName, i, 0);
-				return;
-			}
-		}
-	}
-	
 	public void playDiagram(String adapter){
 		editorModel.loadDiagram(currentPattern, adapter);			
 	}
@@ -149,5 +133,22 @@ public class PatternOverviewController implements PropertyChangeListener{
 	public void deleteAdapter(String adapter) {
 		((DefaultTableModel)overview.getAdapterTable().getModel()).removeRow(overview.getAdapterTable().getSelectedRow());
 		editorModel.deleteAdapter(currentPattern, adapter);
+	}
+
+	public void deletePattern() {
+		int result = JOptionPane.showConfirmDialog(overview, "You are about to delete "+currentPattern+".\nAre you sure?");
+		if (result == JOptionPane.OK_OPTION){
+			((DefaultTableModel)overview.getTable().getModel()).removeRow(overview.getTable().getSelectedRow());
+			patternModel.dbDelete(currentPattern);
+			mainController.removeTab(currentPattern);
+		}
+	}
+
+	public MainScreenController getMainController() {
+		return mainController;
+	}
+
+	public void setMainController(MainScreenController mainController) {
+		this.mainController = mainController;
 	}
 }

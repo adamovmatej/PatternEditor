@@ -59,9 +59,13 @@ public class EditorController implements PropertyChangeListener{
 			return;
 		}
 		if (evt.getPropertyName().equals("newAdapter")){
-			Diagram diagram = ((Adapter) evt.getNewValue()).getDiagram();
-			initListeners(diagram);
-			view.getMap().setComponentAt(view.getMap().getSelectedIndex(), diagram);
+			if (evt.getNewValue() != null){
+				Diagram diagram = ((Adapter) evt.getNewValue()).getDiagram();
+				initListeners(diagram);
+				view.getMap().setComponentAt(view.getMap().getSelectedIndex(), diagram);
+			} else {
+				JOptionPane.showMessageDialog(view, "This adapter already exists!");
+			}
 			return;
 		}
 		if (evt.getPropertyName().equals("adapterChange")){
@@ -180,7 +184,7 @@ public class EditorController implements PropertyChangeListener{
 					RightClickCellMenu menu = new RightClickCellMenu(this, false, true, e);					
 					menu.show(e.getComponent(), e.getX(), e.getY());
 				} else {
-					RightClickCellMenu menu = new RightClickCellMenu(this, false, false, e);		
+					RightClickCellMenu menu = new RightClickCellMenu(this, true, false, e);		
 					menu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			} else {

@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class DiagramModel {
 		loadAdapters();
 	}
 
-	public void createAdapter(List<String> patterns){
+	public void createAdapter(Adapter adapter){
 		mxGraph graph = new mxGraph();
 		Diagram diagram = new Diagram(graph, pattern);
 		mxGraph def = adapters.get("<html>Default</html>").getDiagram().getGraph();
@@ -62,8 +63,9 @@ public class DiagramModel {
 		} finally{
 			graph.getModel().endUpdate();
 		}
-		getDefaulDiagrams(patterns, diagram, cell);
-		currentAdapter = new Adapter(pattern, patterns, diagram);
+		getDefaulDiagrams(adapter.getPatterns(), diagram, cell);
+		adapter.setDiagram(diagram);
+		currentAdapter = adapter;
 		adapters.put(currentAdapter.getLineName(), currentAdapter);
 	}
 	
@@ -77,7 +79,7 @@ public class DiagramModel {
 		}
 	}
 	
-	private mxCell getDefaulDiagram(String name, Diagram diagram, mxCell cell){
+	private mxCell getDefaulDiagram(String name, Diagram diagram, mxCell lastCell){
 		Connection connection = SQLConnection.getInstance().getConnection();
 		String sql = "SELECT xml "
 				+ "FROM pattern "
@@ -87,9 +89,28 @@ public class DiagramModel {
 			pstmt.setString(1, name);
 			
 			ResultSet rs = pstmt.executeQuery();
+			String xml = null;
 			if (rs.next()){
-				String xml = rs.getString("xml");
-				c = diagram.xmlCloneIn(xml, name, cell);
+				xml = rs.getString("xml");
+				if (xml!=null){
+					c = diagram.xmlCloneIn(xml, name, lastCell);
+				}
+			}
+			if (xml == null){
+				diagram.getGraph().getModel().beginUpdate();
+				try{
+					mxGeometry geo = lastCell.getGeometry();
+					Double x = geo.getCenterX() + geo.getWidth()/2 + 20;
+					c = (mxCell) diagram.getGraph().insertVertex(diagram.getGraph().getDefaultParent(), null, name, x.intValue(), 200, 300, 50);
+					c.setStyle("PARENT");
+					c.setConnectable(false);
+					mxGeometry g = c.getGeometry();
+					g.setHeight(g.getHeight()+42);
+					g.setWidth(g.getWidth()+42);
+					c.setGeometry(g);
+				} finally{
+					diagram.getGraph().getModel().endUpdate();
+				}
 			}
 		} catch (SQLException e) {
 			System.out.println(sql);

@@ -24,9 +24,10 @@ public final class SQLConnection {
                     + " xml TEXT"
                     + ");";
     		String adapterTable = "CREATE TABLE IF NOT EXISTS adapter (\n"
-    				+ " name TEXT PRIMARY KEY,\n"
+    				+ " name TEXT,\n"
     				+ " pattern TEXT,\n"
     				+ " xml TEXT,\n"
+    				+ " PRIMARY KEY (name, pattern),\n"
     	            + " FOREIGN KEY(pattern) REFERENCES pattern(name)"
     	            + ");";    		
     		

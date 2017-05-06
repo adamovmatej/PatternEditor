@@ -1,6 +1,9 @@
 package controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
@@ -28,13 +31,14 @@ public class PlayController {
 	}
 	
 	public void play(Diagram diagram){
-		this.diagram = diagram;
-		mxCell cell;
-		for (Object obj : diagram.getGraph().getChildVertices(diagram.getGraph().getDefaultParent())) {
-			cell = (mxCell)obj;
-			if (cell.getValue().equals("Start")){
-				diagram.getGraph().getOutgoingEdges(cell);
-				showScene((mxCell) ((mxCell)diagram.getGraph().getOutgoingEdges(cell)[0]).getTarget());				
+		this.diagram = diagram;		
+		List<Object> cells = new ArrayList<>(Arrays.asList(diagram.getGraph().getChildCells(diagram.getGraph().getDefaultParent())));
+		for (int i = 0; i < cells.size(); i++){
+			mxCell current = (mxCell) cells.get(i);
+			cells.addAll(Arrays.asList(diagram.getGraph().getChildCells(current, true, true)));
+			if (current.getValue().equals("Start")){
+				diagram.getGraph().getOutgoingEdges(current);
+				showScene((mxCell) ((mxCell)diagram.getGraph().getOutgoingEdges(current)[0]).getTarget());				
 				return;
 			}
 		}

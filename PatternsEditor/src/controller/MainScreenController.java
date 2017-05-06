@@ -9,6 +9,7 @@ import java.util.Locale;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
 import model.DiagramModel;
 import model.EditorModel;
@@ -36,6 +37,7 @@ public class MainScreenController implements PropertyChangeListener{
 		setCurrentLocale(Locale.ENGLISH);
 		
 		editorModel.addListener(this);
+		patternModel.addListener(this);
 		this.toolBar = toolBar;
 		this.view = mainScreen;
 		this.bar = bar;
@@ -106,8 +108,14 @@ public class MainScreenController implements PropertyChangeListener{
 		this.currentLocale = currentLocale;
 	}
 
-	public void populateTable(JTable table) {
-		table.setModel(patternModel.generateTableModel());
+	public void populateTable(JTable table, String type) {
+		if (type.equals("diagram")){
+			table.setModel(patternModel.generateNewModelTableModel());
+		} else if (type.equals("adapter")){
+			table.setModel(patternModel.generatNewAdapterTableModel(editorModel.getCurrentDiagramModel().getPattern()));
+		} else {
+			table.setModel(patternModel.generatOpenTableModel());
+		}
 	}
 
 	@Override
@@ -118,6 +126,10 @@ public class MainScreenController implements PropertyChangeListener{
 			} else {
 				bar.chceckDiagramItems(true);
 			}
+			return;
+		}
+		if (evt.getPropertyName().equals("newPattern")){
+			JOptionPane.showMessageDialog(view, "Pattern with this name already exists.");
 			return;
 		}
 	}
@@ -137,6 +149,10 @@ public class MainScreenController implements PropertyChangeListener{
 		editorController.removeTab();
 	}
 
+	public void removeTab(String pattern) {
+		editorController.removeTab(pattern);
+	}
+	
 	public void saveAll() {
 		editorModel.saveAll();
 	}

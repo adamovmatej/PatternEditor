@@ -37,6 +37,7 @@ public class RightClickCellMenu extends JPopupMenu {
 				controller.createDeleteDialog();			
 			}
 		});
+    	this.add(delete);
     	
     	if (state){
     		newState = new JMenuItem("New state");

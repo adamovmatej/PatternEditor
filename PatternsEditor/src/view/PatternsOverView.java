@@ -42,14 +42,6 @@ public class PatternsOverView extends JFrame {
 		splitPane.setDividerLocation(250);
 		getContentPane().add(splitPane, BorderLayout.CENTER);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setMinimumSize(new Dimension(250, 500));
-		splitPane.setLeftComponent(scrollPane);
-		
-		table = new JTable();
-		table.setDefaultEditor(Object.class, null);
-		scrollPane.setViewportView(table);
-		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		splitPane.setRightComponent(tabbedPane);
 		
@@ -67,6 +59,7 @@ public class PatternsOverView extends JFrame {
 		
 		textName = new JTextField();
 		textName.setBounds(12, 32, 459, 19);
+		textName.setFocusable(false);
 		overview.add(textName);
 		textName.setColumns(10);
 		
@@ -80,7 +73,7 @@ public class PatternsOverView extends JFrame {
 		btnOk.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				controller.saveOverview(textName.getText(), textDescription.getText());
+				controller.saveOverview(textDescription.getText());
 				PatternsOverView.this.setVisible(false);
 			}
 		});
@@ -92,7 +85,7 @@ public class PatternsOverView extends JFrame {
 		btnApply.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				controller.saveOverview(textName.getText(), textDescription.getText());
+				controller.saveOverview(textDescription.getText());
 			}
 		});
 		overview.add(btnApply);
@@ -117,8 +110,6 @@ public class PatternsOverView extends JFrame {
 		
 		adapterTable = new JTable();
 		scrollPane_2.setViewportView(adapterTable);
-		
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		adapterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
 		btnPlayAdapters = new JButton("Play");
@@ -140,6 +131,32 @@ public class PatternsOverView extends JFrame {
 			}
 		});
 		adapters.add(btnDelete);
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(null);
+		panel.setPreferredSize(new Dimension(250, 25));
+		splitPane.setLeftComponent(panel);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		panel.add(scrollPane);
+		scrollPane.setBounds(0, 0, 250, 475);
+		scrollPane.setMinimumSize(new Dimension(250, 475));
+		
+		table = new JTable();
+		table.setDefaultEditor(Object.class, null);
+		scrollPane.setViewportView(table);
+		
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		JButton btnPatternDelete = new JButton("Delete Pattern");
+		btnPatternDelete.setBounds(0, 475, 250, 25);
+		btnPatternDelete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.deletePattern();
+			}
+		});
+		panel.add(btnPatternDelete);
 
 	}
 

@@ -47,8 +47,10 @@ public class VersionPanelController implements PropertyChangeListener{
 			return;
 		}
 		if (evt.getPropertyName().equals("newAdapter")){
-			String name = ((Adapter) evt.getNewValue()).getLineName();
-			selectTableRow(name);
+			if (evt.getNewValue()!=null){
+				String name = ((Adapter) evt.getNewValue()).getLineName();
+				selectTableRow(name);				
+			}
 			return;
 		}
 		if (evt.getPropertyName().equals("changeDiagram")){

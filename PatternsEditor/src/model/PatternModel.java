@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.swing.event.SwingPropertyChangeSupport;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import model.db.SQLConnection;
 
@@ -27,8 +28,12 @@ public class PatternModel {
 	}
 	
 	public void createPattern(String name, String description){
-		patterns.add(name);
-		dbInsert(name, description);
+		if (patterns.contains(name)){
+			propertyChangeSupport.firePropertyChange("newPattern", null, null);
+		} else {
+			patterns.add(name);
+			dbInsert(name, description);			
+		}
 	}
 
 	public List<String> getPatterns() {
@@ -79,14 +84,6 @@ public class PatternModel {
 			}
         }
 	}
-	
-	public DefaultTableModel generateTableModel(){
-		DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Organizacne vzory"}, 0);
-		for (String string : patterns) {
-			tableModel.addRow(new Object[]{string});
-		}
-		return tableModel;
-	}
 
 	public Pattern dbGetPattern(String name) {
 		String sql = "SELECT name, description FROM pattern WHERE name = ?";
@@ -112,21 +109,66 @@ public class PatternModel {
         }
 		return pattern;
 	}
-
-	public void updatePattern(String name, String newName, String description) {
-		patterns.set(patterns.indexOf(name), newName);
-		dbUpdatePattern(name, newName, description);
+	
+	public List<String> dbGetNoModelPatterns() {
+		String sql = "SELECT name FROM pattern WHERE xml IS NULL";
+		Connection connection = SQLConnection.getInstance().getConnection();
+		List<String> patterns = new ArrayList<>();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()){
+            	patterns.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+        	System.out.println(sql);
+            System.out.println(e.getMessage());
+        } finally {
+        	try {
+        		if (connection != null){
+        			connection.close();
+        		}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+        }
+		return patterns;
 	}
 	
-	private void dbUpdatePattern(String name, String newName, String description){
-		String sql = "UPDATE pattern SET name = ? , "
-	                + "description = ? "
+	public List<String> dbGetWithModelPatterns() {
+		String sql = "SELECT name FROM pattern WHERE xml IS NOT NULL";
+		Connection connection = SQLConnection.getInstance().getConnection();
+		List<String> patterns = new ArrayList<>();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()){
+            	patterns.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+        	System.out.println(sql);
+            System.out.println(e.getMessage());
+        } finally {
+        	try {
+        		if (connection != null){
+        			connection.close();
+        		}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+        }
+		return patterns;
+	}
+
+	public void updatePattern(String name, String description) {
+		dbUpdatePattern(name, description);
+	}
+	
+	private void dbUpdatePattern(String name, String description){
+		String sql = "UPDATE pattern SET description = ? "
 	                + "WHERE name = ?";
 		Connection connection = SQLConnection.getInstance().getConnection();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, newName);
-            pstmt.setString(2, description);
-            pstmt.setString(3, name);
+            pstmt.setString(1, description);
+            pstmt.setString(2, name);
             pstmt.executeUpdate();
         } catch (SQLException e) {
         	System.out.println(sql);
@@ -140,6 +182,61 @@ public class PatternModel {
 				e.printStackTrace();
 			}
         }
-        propertyChangeSupport.firePropertyChange("patternUpdate", name, new Pattern(newName, description));
+        propertyChangeSupport.firePropertyChange("patternUpdate", name, new Pattern(name, description));
+	}
+	
+	public void dbDelete(String name) {
+		patterns.remove(patterns.indexOf(name));
+		String sql = "DELETE FROM pattern WHERE name = ?";
+		Connection connection = SQLConnection.getInstance().getConnection();
+		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+			pstmt.setString(1, name);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println(sql);
+			System.out.println(e.getMessage());
+		} finally {
+			try {
+				if (connection != null){
+					connection.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public DefaultTableModel generateTableModel(){
+		DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Organizacne vzory"}, 0);
+		for (String string : patterns) {
+			tableModel.addRow(new Object[]{string});
+		}
+		return tableModel;
+	}
+
+	public TableModel generateNewModelTableModel() {
+		DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Organizacne vzory"}, 0);
+		for (String string : dbGetNoModelPatterns()) {
+			tableModel.addRow(new Object[]{string});
+		}
+		return tableModel;
+	}
+
+	public TableModel generatOpenTableModel() {
+		DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Organizacne vzory"}, 0);
+		for (String string : dbGetWithModelPatterns()) {
+			tableModel.addRow(new Object[]{string});
+		}
+		return tableModel;
+	}
+
+	public TableModel generatNewAdapterTableModel(String pattern) {
+		DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Organizacne vzory"}, 0);
+		for (String string : patterns) {
+			if (!string.equals(pattern)){
+				tableModel.addRow(new Object[]{string});				
+			}
+		}
+		return tableModel;
 	}
 }

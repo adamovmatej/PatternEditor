@@ -27,14 +27,13 @@ public class MainMenuBar extends JMenuBar{
 	private JMenu preferences = new JMenu();
 	
 	private JMenuItem newPattern = new JMenuItem();
-	private JMenuItem newDiagram = new JMenuItem();
-	private JMenuItem newVersion = new JMenuItem();
+	private JMenuItem newModel = new JMenuItem();
 	private JMenuItem newAdapter = new JMenuItem();
 	private JMenuItem patternOverView = new JMenuItem();
 	private JMenuItem toolbar = new JMenuItem();
 	private JMenuItem save = new JMenuItem();
 	private JMenuItem open = new JMenuItem();
-	private JMenuItem closeDiagram = new JMenuItem();
+	private JMenuItem closeModel = new JMenuItem();
 	private JMenuItem closeAll = new JMenuItem();
 	private JMenuItem exit = new JMenuItem();
 	private JMenuItem saveAll = new JMenuItem();
@@ -48,7 +47,7 @@ public class MainMenuBar extends JMenuBar{
 			}
 		});
 		
-		newDiagram.addActionListener(new ActionListener() {			
+		newModel.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				controller.createNewDiagramDialog();
@@ -91,8 +90,8 @@ public class MainMenuBar extends JMenuBar{
 				controller.showToolbar();
 			}
 		});
-		closeDiagram.setEnabled(false);
-		closeDiagram.addActionListener(new ActionListener() {			
+		closeModel.setEnabled(false);
+		closeModel.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {				
 				controller.removeTab();
@@ -121,7 +120,7 @@ public class MainMenuBar extends JMenuBar{
 		});
 		
 		file.add(newPattern);
-		file.add(newDiagram);
+		file.add(newModel);
 		file.addSeparator();
 		file.add(save);
 		file.add(saveAll);
@@ -134,7 +133,7 @@ public class MainMenuBar extends JMenuBar{
 		show.add(toolbar);
 		
 		edit.add(newAdapter);
-		edit.add(closeDiagram);
+		edit.add(closeModel);
 		
 		add(file);
 		add(edit);
@@ -162,25 +161,23 @@ public class MainMenuBar extends JMenuBar{
 		preferences.setText(bundle.getString("menu.preferences"));
 		
 		newPattern.setText(bundle.getString("menu.newPattern"));
-		newDiagram.setText(bundle.getString("menu.newModel"));
-		newVersion.setText(bundle.getString("menu.newVersion"));
+		newModel.setText(bundle.getString("menu.newModel"));
 		newAdapter.setText(bundle.getString("menu.newAdapter"));
 		patternOverView.setText(bundle.getString("menu.patternOverView"));
 		toolbar.setText(bundle.getString("menu.toolbar"));
 		save.setText(bundle.getString("menu.save"));
 		open.setText(bundle.getString("menu.open"));
-		closeDiagram.setText(bundle.getString("menu.closeDiagram"));
+		closeModel.setText(bundle.getString("menu.closeModel"));
 		closeAll.setText(bundle.getString("menu.closeAll"));
 		exit.setText(bundle.getString("menu.exit"));
 		saveAll.setText(bundle.getString("menu.saveAll"));
 	}
 
 	public void chceckDiagramItems(Boolean enabled) {
-		closeDiagram.setEnabled(enabled);
+		closeModel.setEnabled(enabled);
 		closeAll.setEnabled(enabled);
 		saveAll.setEnabled(enabled);
 		save.setEnabled(enabled);
 		newAdapter.setEnabled(enabled);
-		newVersion.setEnabled(enabled);
 	}
 }

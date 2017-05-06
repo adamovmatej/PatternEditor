@@ -88,6 +88,7 @@ public class Diagram extends mxGraphComponent{
 		style6.put(mxConstants.STYLE_EDGE, mxEdgeStyle.OrthConnector);
 		style6.put(mxConstants.STYLE_FONTCOLOR, "black");
 		style6.put(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "#E6E6FA");
+		style6.put(mxConstants.STYLE_STROKECOLOR, "black");
 		style6.put(mxConstants.STYLE_STROKEWIDTH, 2);
 	    this.getGraph().getStylesheet().setDefaultEdgeStyle(style6);
 	}
@@ -145,7 +146,7 @@ public class Diagram extends mxGraphComponent{
 						} else if (c.getValue().getClass().equals(String.class)){
 							cells.remove(i);
 						} else {
-							c.setStyle("fillColor=lightgray");
+							c.setStyle("STATE_DISABLED");
 							((State)c.getValue()).setDisabled(true);
 						}
 					}					

@@ -50,10 +50,15 @@ public class EditorModel {
 	}
 	
 	public void createAdapter(List<String> patterns) {
-		currentDiagramModel.createAdapter(patterns);
-		currentAdapterModel.addAdapter(currentDiagramModel.getCurrentAdapter().getLineName());
-		propertyChangeSupport.firePropertyChange("newAdapter", null, currentDiagramModel.getCurrentAdapter());
-	}	
+		Adapter adapter = new Adapter(currentDiagramModel.getPattern(), patterns, null);
+		if (currentDiagramModel.getAdapter(adapter.getLineName())==null){
+			currentDiagramModel.createAdapter(adapter);
+			currentAdapterModel.addAdapter(currentDiagramModel.getCurrentAdapter().getLineName());
+			propertyChangeSupport.firePropertyChange("newAdapter", null, currentDiagramModel.getCurrentAdapter());			
+		} else {
+			propertyChangeSupport.firePropertyChange("newAdapter", null, null);			
+		}
+	}
 
 	public void closeDiagramModel(String pattern) {
 		diagramModels.remove(pattern);
@@ -178,6 +183,10 @@ public class EditorModel {
 			if (map.get(c) == null){
 				map.put(c, true);
 				if (c != end){
+					CellNode node = (CellNode) c.getValue();
+					if (node.getName().isEmpty() || node.getScene().isEmpty()){
+						return false;
+					}
 					List<Object> edges = new ArrayList<>(Arrays.asList(graph.getOutgoingEdges(c)));
 					if (edges.size()==0){
 						System.out.println("No edges");
@@ -186,7 +195,7 @@ public class EditorModel {
 						allDisabled = true;
 						for (Object edge : edges) {
 							Edge e = (Edge)(((mxCell)edge).getValue());
-							if (!e.getDisabled()){
+							if (!e.getDisabled() && ((((mxCell)edge).getTarget()).getValue().getClass().equals(String.class) || !((CellNode)((mxCell)edge).getTarget().getValue()).getDisabled())){
 								allDisabled = false;
 								if ((e.getName().isEmpty() || e.getScene().isEmpty()) && !((mxCell)edge).getTarget().equals(end)){
 									System.out.println("Empty no end edge");

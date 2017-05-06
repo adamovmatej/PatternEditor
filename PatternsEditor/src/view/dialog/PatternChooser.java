@@ -27,8 +27,7 @@ public class PatternChooser extends JDialog {
 	
 	public PatternChooser(MainScreenController controller, String type, Locale locale) {
 		ResourceBundle bundle = ResourceBundle.getBundle("TextBundle", locale);	
-		setResizable(false);
-				
+		setResizable(false);				
 		setModal(true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setAlwaysOnTop(true);
@@ -74,7 +73,7 @@ public class PatternChooser extends JDialog {
 		getContentPane().add(scrollPane);
 		
 		table = new JTable();
-		controller.populateTable(table);
+		controller.populateTable(table, type);
 		table.setTableHeader(null);
 		scrollPane.setViewportView(table);
 		

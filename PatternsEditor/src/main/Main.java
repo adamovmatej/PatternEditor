@@ -45,6 +45,7 @@ public class Main {
 		PatternOverviewController patternOverviewController = new PatternOverviewController(patternModel, editorModel, playController);
 		MainScreenController mainScreenController = new MainScreenController(mainScreen, mainMenuBar, editorModel, patternModel, patternOverviewController, editorController, toolBar);
 		
+		patternOverviewController.setMainController(mainScreenController);
 		versionPanelView.setController(versionPanelController);
 		editorView.setController(editorController);
 		mainMenuBar.setController(mainScreenController);

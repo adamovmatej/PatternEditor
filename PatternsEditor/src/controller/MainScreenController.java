@@ -53,7 +53,7 @@ public class MainScreenController implements PropertyChangeListener{
 	}
 	
 	public void createDiagram(String pattern){
-		editorModel.createDiagramModel(pattern);
+		editorModel.createPatternModel(pattern);
 	}
 	
 	public void createNewAdapterDialog(){
@@ -71,7 +71,7 @@ public class MainScreenController implements PropertyChangeListener{
 	}
 	
 	public void openDiagram(String pattern){
-		if (editorModel.getDiagramModels().get(pattern)!=null){
+		if (editorModel.getPatternModels().get(pattern)!=null){
 			JOptionPane.showMessageDialog(view, "Model for this organizational pattern is alread openned.");
 		} else {
 			editorModel.open(pattern);
@@ -112,7 +112,7 @@ public class MainScreenController implements PropertyChangeListener{
 		if (type.equals("diagram")){
 			table.setModel(patternModel.generateNewModelTableModel());
 		} else if (type.equals("adapter")){
-			table.setModel(patternModel.generatNewAdapterTableModel(editorModel.getCurrentDiagramModel().getPattern()));
+			table.setModel(patternModel.generatNewAdapterTableModel(editorModel.getCurrentPatternModel().getPattern()));
 		} else {
 			table.setModel(patternModel.generatOpenTableModel());
 		}
@@ -120,7 +120,7 @@ public class MainScreenController implements PropertyChangeListener{
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("diagramModelChange") || evt.getPropertyName().equals("newDiagramModel")){
+		if (evt.getPropertyName().equals("patternModelChange") || evt.getPropertyName().equals("newPatternModel")){
 			if (evt.getOldValue() == null){
 				bar.chceckDiagramItems(false);
 			} else {

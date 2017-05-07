@@ -1,23 +1,21 @@
 package model;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.table.DefaultTableModel;
 
-import model.db.SQLConnection;
+import model.db.AdapterDAO;
+import model.db.DAOFactory;
 
 public class AdapterModel extends DefaultTableModel{	
 	
 	private static final long serialVersionUID = 1L;
+	private AdapterDAO adapterDAO;
 	
 	public AdapterModel() {
 		super(new Object[]{"Adapters:"},0);		
+		this.adapterDAO = DAOFactory.getInstance().getAdapterDAO();
 	}
 	
 	public void initTables(PatternModel model) {
@@ -32,37 +30,9 @@ public class AdapterModel extends DefaultTableModel{
 	
 	public void initTables(String pattern, Connection connection){
 		this.addRow(new Object[]{"Default"});
-		String sqlAda = "SELECT name FROM adapter WHERE pattern = ?";
-		Connection con = connection;				
-		if (connection == null){
-			con = SQLConnection.getInstance().getConnection();
-		} else {
-			con = connection;
+		for (String row : adapterDAO.getAdapters(pattern)) {
+			this.addRow(new Object[]{row});
 		}
-        try (PreparedStatement pstmtAda = con.prepareStatement(sqlAda)) {
-        	con.setAutoCommit(false);
-           
-            pstmtAda.setString(1, pattern);
-            ResultSet rs2 = pstmtAda.executeQuery();
-            while (rs2.next()){
-            	System.out.println(rs2.getString("name"));
-            	this.addRow(new Object[]{rs2.getString("name")});
-            }
-        } catch (SQLException e) {
-        	System.out.println(sqlAda);
-            System.out.println(e.getMessage());
-        } finally {
-        	try {
-        		if (con != null){
-        			con.commit();
-        			if (connection == null){
-        				con.close();
-        			}
-        		}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-        }
 	}
 	
 	public void addAdapter(String name){

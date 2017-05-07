@@ -32,12 +32,12 @@ public class VersionPanelController implements PropertyChangeListener{
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("newDiagramModel") || evt.getPropertyName().equals("diagramModelChange")){
-			PatternModel diagramModel = (PatternModel) evt.getNewValue();
+		if (evt.getPropertyName().equals("newPatternModel") || evt.getPropertyName().equals("patternModelChange")){
+			PatternModel patternModel = (PatternModel) evt.getNewValue();
 			AdapterModel adapterModel = (AdapterModel) evt.getOldValue();
 			if (adapterModel != null){
 				view.getAdapterTable().setModel(adapterModel);
-				selectTableRow(diagramModel.getCurrentAdapter().getLineName());
+				selectTableRow(patternModel.getCurrentAdapter().getLineName());
 			} else {
 				view.getAdapterTable().setModel(new DefaultTableModel());
 			}
@@ -82,7 +82,7 @@ public class VersionPanelController implements PropertyChangeListener{
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (view.getAdapterTable().getSelectedRow()!=-1){
-					model.getCurrentDiagramModel().changeAdapter((String) view.getAdapterTable().getModel().getValueAt(view.getAdapterTable().getSelectedRow(), 0));
+					model.getCurrentPatternModel().changeAdapter((String) view.getAdapterTable().getModel().getValueAt(view.getAdapterTable().getSelectedRow(), 0));
 				}	
 			}
 		});

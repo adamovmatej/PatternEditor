@@ -37,15 +37,17 @@ public class PatternModel {
 	}
 	
 	public PatternModel(String pattern) {
+		propertyChangeSupport = new SwingPropertyChangeSupport(this);
 		this.patternDAO = DAOFactory.getInstance().getPatternDAO();
 		this.adapterDAO = DAOFactory.getInstance().getAdapterDAO();
 		this.setPattern(pattern);
-		propertyChangeSupport = new SwingPropertyChangeSupport(this);
+		
 		List<String> list = new ArrayList<>();
 		list.add("Default");
 		currentAdapter = new Adapter(pattern, list);
 		adapters = new HashMap<String, Adapter>();
 		adapters.put(currentAdapter.getLineName(), currentAdapter);
+		System.out.println(adapters.get("<html>Default</html>"));
 	}
 	
 	public void load(String name){
@@ -96,7 +98,9 @@ public class PatternModel {
 	}	
 
 	private void loadAdapters() {
+		Adapter def = adapters.get("<html>Default</html>");
         adapters = patternDAO.dbLoadAdapters(pattern);
+        adapters.put("<html>Default</html>", def);
 	}
 	
 	public void loadAdapter(String name){

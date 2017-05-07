@@ -2,7 +2,10 @@ package model.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AdapterDAO {
 	
@@ -71,5 +74,32 @@ public class AdapterDAO {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public List<String> getAdapters(String pattern){
+		List<String> result = new ArrayList<>();
+		String sqlAda = "SELECT name FROM adapter WHERE pattern = ?";
+		Connection connection = SQLConnection.getInstance().getConnection();
+        try (PreparedStatement pstmtAda = connection.prepareStatement(sqlAda)) {
+        	connection.setAutoCommit(false);
+           
+            pstmtAda.setString(1, pattern);
+            ResultSet rs2 = pstmtAda.executeQuery();
+            while (rs2.next()){
+            	result.add(rs2.getString("name"));
+            }
+        } catch (SQLException e) {
+        	System.out.println(sqlAda);
+            System.out.println(e.getMessage());
+        } finally {
+        	try {
+        		if (connection != null){
+        			connection.close();
+        		}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+        }
+        return result;
 	}
 }

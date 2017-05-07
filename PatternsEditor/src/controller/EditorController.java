@@ -41,7 +41,7 @@ public class EditorController implements PropertyChangeListener{
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				if (((CustomTabPane)view.getMap()).getTabCount()>0){
-					editorModel.changeDiagramModel(((Diagram) view.getMap().getComponentAt(view.getMap().getSelectedIndex())).getPattern());					
+					editorModel.changePatternModel(((Diagram) view.getMap().getComponentAt(view.getMap().getSelectedIndex())).getPattern());					
 				}
 			}
 		});
@@ -50,11 +50,11 @@ public class EditorController implements PropertyChangeListener{
 	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (evt.getPropertyName().equals("newDiagramModel")){
-			PatternModel diagramModel = (PatternModel)evt.getNewValue();
-			diagramModel.addListener(this);
-			initListenersDiagramModel(diagramModel);
-			Diagram diagram = diagramModel.getCurrentAdapter().getDiagram();
+		if (evt.getPropertyName().equals("newPatternModel")){
+			PatternModel patternModel = (PatternModel)evt.getNewValue();
+			patternModel.addListener(this);
+			initListenersPatternModel(patternModel);
+			Diagram diagram = patternModel.getCurrentAdapter().getDiagram();
 			insertDiagram(diagram);
 			return;
 		}
@@ -78,27 +78,27 @@ public class EditorController implements PropertyChangeListener{
 	
 	public void removeTab(String name){
 		view.getMap().remove(name);
-		model.closeDiagramModel(name);
+		model.closePatternModel(name);
 		if (view.getMap().getTabCount()==0){
-			model.changeDiagramModel(null);
+			model.changePatternModel(null);
 		} else {
-			model.changeDiagramModel(((Diagram)view.getMap().getSelectedComponent()).getPattern());			
+			model.changePatternModel(((Diagram)view.getMap().getSelectedComponent()).getPattern());			
 		}
 	}
 	
 	public void removeTab(){
 		String name = view.getMap().getTitleAt(view.getMap().getSelectedIndex());
 		view.getMap().remove(name);
-		model.closeDiagramModel(name);
+		model.closePatternModel(name);
 		if (view.getMap().getTabCount()==0){
-			model.changeDiagramModel(null);
+			model.changePatternModel(null);
 		} else {
-			model.changeDiagramModel(((Diagram)view.getMap().getSelectedComponent()).getPattern());			
+			model.changePatternModel(((Diagram)view.getMap().getSelectedComponent()).getPattern());			
 		}
 	}
 	
 	public void createPropertiesDialog(MouseEvent me){
-		Diagram diagram = model.getCurrentDiagramModel().getCurrentAdapter().getDiagram();
+		Diagram diagram = model.getCurrentPatternModel().getCurrentAdapter().getDiagram();
 		mxCell cell = (mxCell)(diagram.getCellAt(me.getX(), me.getY()));
 		if (cell.isEdge()){
 			Object obj = cell.getValue();
@@ -202,9 +202,9 @@ public class EditorController implements PropertyChangeListener{
 		view.getMap().setSelectedComponent(diagram);
 	}
 		
-	private void initListenersDiagramModel(PatternModel diagramModel){
-		for (String key : diagramModel.getAdapters().keySet()){
-			initListeners(diagramModel.getAdapters().get(key).getDiagram());
+	private void initListenersPatternModel(PatternModel patternModel){
+		for (String key : patternModel.getAdapters().keySet()){
+			initListeners(patternModel.getAdapters().get(key).getDiagram());
 		}
 	}
 	

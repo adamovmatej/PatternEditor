@@ -23,7 +23,7 @@ public class EditorModel {
 	private SwingPropertyChangeSupport propertyChangeSupport;
 	private Map<String, PatternModel> patternModels;
 	private Map<String, AdapterModel> adapterModels;
-	private PatternModel currentDiagramModel;
+	private PatternModel currentPatternModel;
 	private AdapterModel currentAdapterModel;
 	private AdapterDAO adapterDAO;
 	private int tool;
@@ -36,36 +36,36 @@ public class EditorModel {
 		propertyChangeSupport = new SwingPropertyChangeSupport(this);
 	}
 	
-	public void createDiagramModel(String name){
-		currentDiagramModel = new PatternModel(name);
-		patternModels.put(name, currentDiagramModel);
+	public void createPatternModel(String name){
+		currentPatternModel = new PatternModel(name);
+		patternModels.put(name, currentPatternModel);
 		currentAdapterModel = new AdapterModel();
 		initAdapterModelListeners(currentAdapterModel);
-		currentAdapterModel.initTables(currentDiagramModel);
+		currentAdapterModel.initTables(currentPatternModel);
 		adapterModels.put(name, currentAdapterModel);
-		propertyChangeSupport.firePropertyChange("newDiagramModel", currentAdapterModel, currentDiagramModel);
+		propertyChangeSupport.firePropertyChange("newPatternModel", currentAdapterModel, currentPatternModel);
 	}
 
-	public void changeDiagramModel(String name) {
-		if (!currentDiagramModel.getCurrentAdapter().getPattern().equals(name)){
+	public void changePatternModel(String name) {
+		if (!currentPatternModel.getCurrentAdapter().getPattern().equals(name)){
 			currentAdapterModel = adapterModels.get(name);
-			currentDiagramModel = patternModels.get(name);
-			propertyChangeSupport.firePropertyChange("diagramModelChange", currentAdapterModel, currentDiagramModel);			
+			currentPatternModel = patternModels.get(name);
+			propertyChangeSupport.firePropertyChange("patternModelChange", currentAdapterModel, currentPatternModel);			
 		}
 	}
 	
 	public void createAdapter(List<String> patterns) {
-		Adapter adapter = new Adapter(currentDiagramModel.getPattern(), patterns, null);
-		if (currentDiagramModel.getAdapter(adapter.getLineName())==null){
-			currentDiagramModel.createAdapter(adapter);
-			currentAdapterModel.addAdapter(currentDiagramModel.getCurrentAdapter().getLineName());
-			propertyChangeSupport.firePropertyChange("newAdapter", null, currentDiagramModel.getCurrentAdapter());			
+		Adapter adapter = new Adapter(currentPatternModel.getPattern(), patterns, null);
+		if (currentPatternModel.getAdapter(adapter.getLineName())==null){
+			currentPatternModel.createAdapter(adapter);
+			currentAdapterModel.addAdapter(currentPatternModel.getCurrentAdapter().getLineName());
+			propertyChangeSupport.firePropertyChange("newAdapter", null, currentPatternModel.getCurrentAdapter());			
 		} else {
 			propertyChangeSupport.firePropertyChange("newAdapter", null, null);			
 		}
 	}
 
-	public void closeDiagramModel(String pattern) {
+	public void closePatternModel(String pattern) {
 		patternModels.remove(pattern);
 		adapterModels.remove(pattern);
 	}
@@ -86,7 +86,7 @@ public class EditorModel {
 		return adapterModels.get(pattern);
 	}
 	
-	public Map<String, PatternModel> getDiagramModels() {
+	public Map<String, PatternModel> getPatternModels() {
 		return patternModels;
 	}
 
@@ -94,12 +94,12 @@ public class EditorModel {
 		this.patternModels = diagramModels;
 	}
 
-	public PatternModel getCurrentDiagramModel() {
-		return currentDiagramModel;
+	public PatternModel getCurrentPatternModel() {
+		return currentPatternModel;
 	}
 
 	public void setCurrentDiagramModel(PatternModel currentDiagramModel) {
-		this.currentDiagramModel = currentDiagramModel;
+		this.currentPatternModel = currentDiagramModel;
 	}
 
 	public AdapterModel getCurrentAdapterModel() {
@@ -111,18 +111,18 @@ public class EditorModel {
 	}
 
 	public void save() {
-		currentDiagramModel.saveAll();
+		currentPatternModel.saveAll();
 	}
 	
 	public void open(String name) {
-		currentDiagramModel = new PatternModel(name);
-		currentDiagramModel.load(name);
-		patternModels.put(name, currentDiagramModel);
+		currentPatternModel = new PatternModel(name);
+		currentPatternModel.load(name);
+		patternModels.put(name, currentPatternModel);
 		currentAdapterModel = new AdapterModel();
 		initAdapterModelListeners(currentAdapterModel);
-		currentAdapterModel.initTables(currentDiagramModel);
+		currentAdapterModel.initTables(currentPatternModel);
 		adapterModels.put(name, currentAdapterModel);
-		propertyChangeSupport.firePropertyChange("newDiagramModel", currentAdapterModel, currentDiagramModel);
+		propertyChangeSupport.firePropertyChange("newPatternModel", currentAdapterModel, currentPatternModel);
 	}
 	
 	public void loadDiagram(String pattern, String name){

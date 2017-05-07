@@ -86,6 +86,7 @@ public class Diagram extends mxGraphComponent{
 		
 		Map<String, Object> style6 = graph.getStylesheet().getDefaultEdgeStyle();
 		style6.put(mxConstants.STYLE_EDGE, mxEdgeStyle.OrthConnector);
+		style6.put(mxConstants.STYLE_WHITE_SPACE, "wrap");
 		style6.put(mxConstants.STYLE_FONTCOLOR, "black");
 		style6.put(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "#E6E6FA");
 		style6.put(mxConstants.STYLE_STROKECOLOR, "black");

@@ -40,7 +40,7 @@ public class CellPropertiesDialog extends JDialog {
 		getContentPane().setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("Name:");
-		lblNewLabel.setBounds(10, 11, 46, 14);
+		lblNewLabel.setBounds(10, 11, 70, 14);
 		getContentPane().add(lblNewLabel);
 		
 		nameField = new JTextField(name);
@@ -49,7 +49,7 @@ public class CellPropertiesDialog extends JDialog {
 		nameField.setColumns(10);
 		
 		JLabel lblScene = new JLabel("Scene:");
-		lblScene.setBounds(10, 36, 46, 14);
+		lblScene.setBounds(10, 36, 70, 14);
 		getContentPane().add(lblScene);
 		
 		sceneText = new JTextArea(scene);

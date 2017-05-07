@@ -135,22 +135,21 @@ public class Diagram extends mxGraphComponent{
 					cell.setConnectable(false);
 					codec.decode(document.getDocumentElement(), temp.getModel());	
 					List<Object> cells = new ArrayList<Object>(Arrays.asList(temp.getChildCells(temp.getDefaultParent())));
-					for (int i = 0; i < cells.size(); i++) {
+					int i = 0;
+					while (i < cells.size()) {
 						mxCell c = (mxCell) cells.get(i);
 						if (c.isEdge()){
 							c.setStyle("DASHED");
-							if (c.getValue().getClass().equals(String.class)){
-								c.setValue(new Edge("", "", true));
-							}else {
-								((Edge)c.getValue()).setDisabled(true);
-							}
-						} else if (c.getValue().getClass().equals(String.class)){
-							cells.remove(i);
-						} else {
+							((Edge)c.getValue()).setDisabled(true);
+							i++;
+						} else if (c.getValue().getClass().equals(State.class)){
 							c.setStyle("STATE_DISABLED");
 							((State)c.getValue()).setDisabled(true);
+							i++;
+						} else {
+							cells.remove(i);
 						}
-					}					
+					}		
 					graph.addCells(temp.cloneCells(cells.toArray()), cell);	
 					List<Object> toRemove = new ArrayList<>();
 					for (Object object : graph.getChildEdges(cell)) {
@@ -163,6 +162,18 @@ public class Diagram extends mxGraphComponent{
 					g.setHeight(g.getHeight()+42);
 					g.setWidth(g.getWidth()+42);
 					cell.setGeometry(g);
+					
+					cells = new ArrayList<Object>(Arrays.asList(temp.getChildCells(cell)));
+					for (Object obj : cells) {
+						mxCell c = (mxCell)obj;
+						if (c.isEdge()){
+							Edge value = (Edge) c.getValue();
+							c.setValue(new Edge(value.getName(), value.getScene(), value.getDisabled()));
+						} else {
+							State value = (State) c.getValue();
+							c.setValue(new State(value.getName(), value.getScene(), value.getDisabled()));
+						}
+					}
 				} finally{
 					graph.getModel().endUpdate();
 				}

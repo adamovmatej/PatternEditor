@@ -5,6 +5,8 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -17,7 +19,7 @@ public class BackgroundPane extends JPanel{
 
 	public BackgroundPane(String filePath) {
 		try {
-			image = ImageIO.read(new File(filePath));
+			image = ImageIO.read(Files.newInputStream(Paths.get(filePath)));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		

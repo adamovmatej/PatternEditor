@@ -134,7 +134,7 @@ public class MainScreenController implements PropertyChangeListener{
 		}
 	}
 
-	public void saveDiagram() {
+	public void saveModel() {
 		editorModel.save();
 	}
 
@@ -144,7 +144,7 @@ public class MainScreenController implements PropertyChangeListener{
 			return;
 		}
 		if (result == JOptionPane.OK_OPTION){
-			saveDiagram();
+			saveModel();
 		}
 		editorController.removeTab();
 	}
@@ -158,12 +158,15 @@ public class MainScreenController implements PropertyChangeListener{
 	}
 
 	public void exit() {
-		int result = JOptionPane.showConfirmDialog(view, "Do you want to save before exit?");
-		if (result == JOptionPane.CANCEL_OPTION){
-			return;
-		}
-		if (result == JOptionPane.OK_OPTION){
-			saveAll();
+		if (!editorModel.getPatternModels().isEmpty()){
+			int result = JOptionPane.showConfirmDialog(view, "Do you want to save before exit?");
+			
+			if (result == JOptionPane.CANCEL_OPTION){
+				return;
+			}
+			if (result == JOptionPane.OK_OPTION){
+				saveAll();
+			}
 		}
 		view.dispose();
 	}

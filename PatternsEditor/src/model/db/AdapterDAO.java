@@ -9,7 +9,7 @@ import java.util.List;
 
 public class AdapterDAO {
 	
-	public void dbSave(String xml, String name, String pattern){
+	public void dbSave(String name, String pattern, String xml){
 		Connection connection = SQLConnection.getInstance().getConnection();
 		String sql = "UPDATE adapter SET xml = ? "
                 + "WHERE name = ? AND pattern = ?";	

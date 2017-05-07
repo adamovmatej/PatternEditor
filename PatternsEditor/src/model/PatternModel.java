@@ -70,6 +70,17 @@ public class PatternModel {
 			g.setHeight(g.getHeight()+42);
 			g.setWidth(g.getWidth()+42);
 			cell.setGeometry(g);
+			List<Object> cells = new ArrayList<Object>(Arrays.asList(graph.getChildCells(cell)));
+			for (Object obj : cells) {
+				mxCell c = (mxCell)obj;
+				if (c.isEdge()){
+					Edge value = (Edge) c.getValue();
+					c.setValue(new Edge(value.getName(), value.getScene(), value.getDisabled()));
+				} else if (!c.getValue().getClass().equals(String.class)){
+					State value = (State) c.getValue();
+					c.setValue(new State(value.getName(), value.getScene(), value.getDisabled()));
+				}
+			}
 		} finally{
 			graph.getModel().endUpdate();
 		}
@@ -114,6 +125,7 @@ public class PatternModel {
 			adapter = adapters.get(key);
 			if (!key.equals("<html>Default</html>")){
 				if (adapter.getIsNew()){
+					System.out.println(key);
 					adapterDAO.dbInsert(adapter.getName(), adapter.getPattern(), adapter.getDiagram().getXml());
 					adapter.setIsNew(false);
 				} else {

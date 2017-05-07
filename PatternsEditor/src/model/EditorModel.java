@@ -141,6 +141,7 @@ public class EditorModel {
 	}
 	
 	private boolean checkDiagram(PatternModel model) {
+		System.out.println("Check!");
 		mxCell start=null;
 		mxCell end=null;
 		Boolean endReached = false;
@@ -165,6 +166,11 @@ public class EditorModel {
 			System.out.println("No start or end");
 			return false;
 		}
+		
+		for (Object edge : graph.getIncomingEdges(end)) {
+			((Edge)((mxCell)edge).getValue()).setScene("End");
+		}
+		
 		Map<mxCell, Boolean> map = new HashMap<>();
 		Stack<mxCell> stack = new Stack<>();
 		stack.clear();
@@ -190,6 +196,7 @@ public class EditorModel {
 				if (c != end){
 					CellNode node = (CellNode) c.getValue();
 					if (node.getName().isEmpty() || node.getScene().isEmpty()){
+						System.out.println("Empty node: "+node.getName());
 						return false;
 					}
 					List<Object> edges = new ArrayList<>(Arrays.asList(graph.getOutgoingEdges(c)));

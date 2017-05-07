@@ -109,6 +109,7 @@ public class PatternsOverView extends JFrame {
 		adapters.add(scrollPane_2);
 		
 		adapterTable = new JTable();
+		adapterTable.setDefaultEditor(Object.class, null);
 		scrollPane_2.setViewportView(adapterTable);
 		adapterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		

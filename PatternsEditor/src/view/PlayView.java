@@ -1,6 +1,7 @@
 package view;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.ListSelectionModel;
@@ -43,7 +44,8 @@ public class PlayView extends JFrame{
 		setBounds(50, 50, 1000, 750);
 		setAlwaysOnTop(true);
 		
-		BackgroundPane panel = new BackgroundPane("resources/gameimage.png");
+		JPanel panel = new BackgroundPane("resources/gameimage.png");
+		panel.setBackground(Color.blue);
 		getContentPane().add(panel);
 		panel.setLayout(null);	
 		

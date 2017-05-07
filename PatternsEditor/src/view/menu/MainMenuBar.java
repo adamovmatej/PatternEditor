@@ -73,7 +73,7 @@ public class MainMenuBar extends JMenuBar{
 		save.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				controller.saveDiagram();
+				controller.saveModel();
 			}
 		});
 		
